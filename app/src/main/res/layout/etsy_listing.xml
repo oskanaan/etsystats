@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal">
+  <ImageView android:layout_height="54dip"
+             android:layout_width="100dip"
+             android:id="@+id/listingImage"/>
+  <TextView android:id="@+id/listingTitle"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"/>
+</LinearLayout>
