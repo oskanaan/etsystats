@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -27,7 +28,7 @@ public class ListingAdapter extends SimpleAdapter {
 
   private Context ctx ;
   private ImageLoader imageLoader;
-  List<JSONObject> data;
+  JSONArray data;
   private String idColumnName;
   /**
    * Constructor
@@ -43,7 +44,7 @@ public class ListingAdapter extends SimpleAdapter {
    * @param to       The views that should display column in the "from" parameter. These should all be
    *                 TextViews. The first N views in this list are given the values of the first N columns
    */
-  public ListingAdapter(Context context, List<JSONObject> data, int resource, String[] from, int[] to, String idColumnName) {
+  public ListingAdapter(Context context, JSONArray data, int resource, String[] from, int[] to, String idColumnName) {
     super(context, null, resource, from, to);
     this.data = data;
     this.ctx = context;
@@ -67,10 +68,17 @@ public class ListingAdapter extends SimpleAdapter {
       holder=(ViewHolder)vi.getTag();
     }
     try {
-      String title = data.get(position).get("title").toString();
-      holder.text.setText(title.substring(0,Math.min(title.length()-1, 50))+"...");
-      holder.image.setTag(((JSONObject) ((JSONArray) data.get(position).get("Images")).get(0)).getString("url_75x75"));
-      imageLoader.displayImage(((JSONObject) ((JSONArray) data.get(position).get("Images")).get(0)).getString("url_75x75"), ((Activity) ctx), holder.image);
+      JSONObject jsonObject = ((JSONObject) data.get(position));
+      String title = jsonObject.getString("title");
+      holder.text.setText(title.substring(0, Math.min(title.length(), 50)) + (title.length() > 50 ? "..." : ""));
+      if(jsonObject.has("Images")){
+        holder.image.setTag(((JSONObject) ((JSONArray)jsonObject.get("Images")).get(0)).getString("url_75x75"));
+        imageLoader.displayImage(((JSONObject) ((JSONArray) jsonObject.get("Images")).get(0)).getString("url_75x75"), ((Activity) ctx), holder.image);
+      }
+      else{
+        holder.image.getLayoutParams().width = 10;
+        holder.image.requestLayout();
+      }
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -81,30 +89,35 @@ public class ListingAdapter extends SimpleAdapter {
 
   @Override
   public int getCount() {
-    return data.size();
+    return data.length();
   }
 
   @Override
   public Object getItem(int position) {
-    return data.get(position);
+    try {
+      return data.get(position);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override
   public long getItemId(int position) {
     // TODO Auto-generated method stub
     try {
-      return ((Integer)data.get(position).get(idColumnName)).longValue();
+      return ((Integer)((JSONObject)data.get(position)).get(idColumnName)).longValue();
     } catch (JSONException e) {
       e.printStackTrace();
     }
     return -1;
   }
 
-  public List<JSONObject> getData() {
+  public JSONArray getData() {
     return data;
   }
 
-  public void setData(List<JSONObject> data) {
+  public void setData(JSONArray data) {
     this.data = data;
   }
 

@@ -10,9 +10,16 @@
   <string name="pref_title_shop_name">Shop Name</string>
   <string name="error_multiple_shops_with_similar_name">Found multiple shops with similar name. Use a unique name.</string>
   <string name="error_no_shop_with_similar_name">Couldnt find any shop with the name used.</string>
+  <string name="error_please_setup_your_shop">Your shop has not been set. Use the settings menu to enter your shop name.</string>
   <string name="shop_found_and_id_saved">We\'ve found your shop on Etsy. Your shop name has been set and shop ID retrieved.</string>
   <string name="title_activity_my_items">MyItems</string>
   <string name="title_activity_shop_categories">ShopCategories</string>
+  <string name="title_activity_category_listings">Listings</string>
+  <string name="title_activity_listing_options">ListingOptions</string>
+  <string name="hint_search_term1">Search Term 1</string>
+  <string name="hint_search_term2">Search Term 2</string>
+  <string name="hint_search_term3">Search Term 3</string>
+  <string name="favourite">Favourite</string>
 
 
   <!--<string name="pref_title_add_friends_to_messages">Add friends to messages</string>-->

@@ -76,7 +76,7 @@ public class EtsyUtils {
     }
     else{
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-      return prefs.getString("shopId", null);
+      return prefs.getString("shop_id", null);
     }
 
   }
@@ -109,4 +109,5 @@ public class EtsyUtils {
 
     return listings;
   }
+
 }

@@ -47,7 +47,7 @@ import java.util.List;
 public class Dashboard extends Activity{
 
   ListingAdapter adapter ;
-  List<JSONObject> data = new ArrayList<JSONObject>();
+  JSONArray data = new JSONArray();
   int selection = 0;
   ListView mDrawerList;
 
@@ -82,7 +82,12 @@ public class Dashboard extends Activity{
     mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String shopId = EtsyUtils.getShopId(Dashboard.this);
         if(position == 1){
+          if(shopId == null){
+            Toast.makeText(Dashboard.this, R.string.error_please_setup_your_shop, Toast.LENGTH_LONG).show();
+            return;
+          }
           startActivity(new Intent(Dashboard.this, ShopCategories.class));
         } else if(position == 2){
           //settings
@@ -130,7 +135,7 @@ public class Dashboard extends Activity{
 
           for (int i = 0; i < listings.length(); i++) {
             JSONObject listing = (JSONObject) listings.get(i);
-            data.add(listing);
+            data.put(listing);
 
             if (listing.get("listing_id").equals(262516286)) {
               exit = true;
@@ -155,7 +160,7 @@ public class Dashboard extends Activity{
     @Override
     protected void onPostExecute(Object o) {
       super.onPostExecute(o);
-      List<JSONObject> returnedData = (List<JSONObject>) o;
+      JSONArray returnedData = (JSONArray) o;
       adapter = new ListingAdapter(Dashboard.this, returnedData, R.layout.etsy_listing, null, null, "listing_id");
       ((ListView)Dashboard.this.findViewById(R.id.listings)).setAdapter(adapter);
     }

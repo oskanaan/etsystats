@@ -1,12 +1,8 @@
 package com.meccaartwork.etsystats;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -24,40 +20,44 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShopCategories extends AppCompatActivity {
+public class CategoryListings extends AppCompatActivity {
 
   List<JSONObject> data = new ArrayList<JSONObject>();
   ListingAdapter adapter;
+  String categoryId;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_shop_categories);
+
+    Bundle bundle = getIntent().getExtras();
+    categoryId = bundle.getString(Constants.SECTION_ID);
+
+    setContentView(R.layout.activity_category_listing);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    ((ListView)ShopCategories.this.findViewById(R.id.shopCategories)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    new AsyncLoadData().execute();
+
+    ((ListView)CategoryListings.this.findViewById(R.id.categoryListings)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        JSONObject obj = (JSONObject)parent.getAdapter().getItem(position);
-        if(adapter != null){
+        JSONObject obj = (JSONObject) parent.getAdapter().getItem(position);
+        if (adapter != null) {
           Bundle bundle = new Bundle();
           try {
-            bundle.putString(Constants.SECTION_ID, obj.getString("shop_section_id"));
+            bundle.putString(Constants.LISTING_ID, obj.getString("listing_id"));
           } catch (JSONException e) {
             e.printStackTrace();
           }
 
-          Intent startCategoryListings = new Intent();
-          startCategoryListings.putExtras(bundle);
-          startCategoryListings.setClassName("com.meccaartwork.etsystats", "com.meccaartwork.etsystats.CategoryListings");
-          startActivity(startCategoryListings);
+          Intent startListingOptions = new Intent();
+          startListingOptions.putExtras(bundle);
+          startListingOptions.setClassName("com.meccaartwork.etsystats", "com.meccaartwork.etsystats.ListingOptions");
+          startActivity(startListingOptions);
         }
       }
     });
-
-    new AsyncLoadData().execute();
-
 //    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //    fab.setOnClickListener(new View.OnClickListener() {
 //      @Override
@@ -72,9 +72,9 @@ public class ShopCategories extends AppCompatActivity {
 
     @Override
     protected Object doInBackground(Object[] params) {
-      String shopId = EtsyUtils.getShopId(ShopCategories.this);
+      String shopId = EtsyUtils.getShopId(CategoryListings.this);
 
-      String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
+      String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections/"+categoryId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
       JSONArray sections = EtsyUtils.getResultsFromUrl(url);
 
      return sections;
@@ -87,9 +87,8 @@ public class ShopCategories extends AppCompatActivity {
       }
       super.onPostExecute(o);
       JSONArray returnedData = (JSONArray) o;
-      adapter = new ListingAdapter(ShopCategories.this, returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
-      ((ListView)ShopCategories.this.findViewById(R.id.shopCategories)).setAdapter(adapter);
-
+      adapter = new ListingAdapter(CategoryListings.this, returnedData, R.layout.etsy_listing, null, null, "listing_id");
+      ((ListView)CategoryListings.this.findViewById(R.id.categoryListings)).setAdapter(adapter);
     }
   }
 }
