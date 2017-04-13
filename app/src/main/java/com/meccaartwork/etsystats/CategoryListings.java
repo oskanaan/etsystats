@@ -1,10 +1,15 @@
 package com.meccaartwork.etsystats;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -22,9 +27,43 @@ import java.util.List;
 
 public class CategoryListings extends AppCompatActivity {
 
-  List<JSONObject> data = new ArrayList<JSONObject>();
   ListingAdapter adapter;
   String categoryId;
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.options_menu, menu);
+
+    // Associate searchable configuration with the SearchView
+    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String query) {
+        return reloadResults(query);
+      }
+
+      @Override
+      public boolean onQueryTextChange(String newText) {
+        return reloadResults(newText);
+      }
+    });
+    return true;
+  }
+
+  private boolean reloadResults(String text) {
+    try {
+      adapter.filterData(text);
+    } catch (JSONException e) {
+      e.printStackTrace();
+      return false;
+    }
+
+    return true;
+  }
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +86,8 @@ public class CategoryListings extends AppCompatActivity {
           Bundle bundle = new Bundle();
           try {
             bundle.putString(Constants.LISTING_ID, obj.getString("listing_id"));
+            bundle.putString(Constants.LISTING_TITLE, obj.getString("title"));
+              bundle.putString(Constants.LISTING_IMAGE_URL, ((JSONObject) ((JSONArray)obj.get("Images")).get(0)).getString("url_570xN"));
           } catch (JSONException e) {
             e.printStackTrace();
           }
@@ -58,14 +99,6 @@ public class CategoryListings extends AppCompatActivity {
         }
       }
     });
-//    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//    fab.setOnClickListener(new View.OnClickListener() {
-//      @Override
-//      public void onClick(View view) {
-//        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//            .setAction("Action", null).show();
-//      }
-//    });
   }
 
   private class AsyncLoadData extends AsyncTask {
@@ -74,10 +107,28 @@ public class CategoryListings extends AppCompatActivity {
     protected Object doInBackground(Object[] params) {
       String shopId = EtsyUtils.getShopId(CategoryListings.this);
 
-      String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections/"+categoryId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
-      JSONArray sections = EtsyUtils.getResultsFromUrl(url);
+      JSONArray sections;
+      if(Integer.parseInt(categoryId) == Constants.NO_CATEGORY){
+        String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
+        JSONArray allListings = EtsyUtils.getResultsFromUrl(url);
+        sections = new JSONArray();
+        for(int i=0 ; i < allListings.length() ; i++){
+          JSONObject jsonObject = null;
+          try {
+            jsonObject = ((JSONObject) allListings.get(i));
+            if(jsonObject.get("shop_section_id") == JSONObject.NULL){
+              sections.put(jsonObject);
+            }
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+        }
+      } else {
+        String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections/"+categoryId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
+        sections = EtsyUtils.getResultsFromUrl(url);
+      }
 
-     return sections;
+      return sections;
     }
 
     @Override

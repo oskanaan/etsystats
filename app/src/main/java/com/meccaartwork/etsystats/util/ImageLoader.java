@@ -181,6 +181,7 @@ public class ImageLoader {
               photoToLoad=photosQueue.photosToLoad.pop();
             }
             Bitmap bmp=getBitmap(photoToLoad.url);
+            bmp = ImageHelper.getRoundedCornerBitmap(bmp, 20);
             cache.put(photoToLoad.url, bmp);
             if(((String)photoToLoad.imageView.getTag()).equals(photoToLoad.url)){
               BitmapDisplayer bd=new BitmapDisplayer(bmp, photoToLoad.imageView);

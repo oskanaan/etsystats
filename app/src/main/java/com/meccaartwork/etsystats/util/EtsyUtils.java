@@ -2,6 +2,11 @@ package com.meccaartwork.etsystats.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -17,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Objects;
@@ -110,4 +116,14 @@ public class EtsyUtils {
     return listings;
   }
 
+  public static Drawable drawableFromUrl(Resources resources, String url) throws IOException {
+    Bitmap x;
+
+    HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+    connection.connect();
+    InputStream input = connection.getInputStream();
+
+    x = BitmapFactory.decodeStream(input);
+    return new BitmapDrawable(resources, x);
+  }
 }

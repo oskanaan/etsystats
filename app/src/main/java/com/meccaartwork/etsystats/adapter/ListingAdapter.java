@@ -1,8 +1,10 @@
 package com.meccaartwork.etsystats.adapter;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,28 +31,41 @@ public class ListingAdapter extends SimpleAdapter {
   private Context ctx ;
   private ImageLoader imageLoader;
   JSONArray data;
+  //Keep the result returned from the server intact
+  JSONArray originalData;
   private String idColumnName;
-  /**
-   * Constructor
-   *
-   * @param context  The context where the View associated with this SimpleAdapter is running
-   * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
-   *                 Maps contain the data for each row, and should include all the entries specified in
-   *                 "from"
-   * @param resource Resource identifier of a view layout that defines the views for this list
-   *                 item. The layout file should include at least those named views defined in "to"
-   * @param from     A list of column names that will be added to the Map associated with each
-   *                 item.
-   * @param to       The views that should display column in the "from" parameter. These should all be
-   *                 TextViews. The first N views in this list are given the values of the first N columns
-   */
+  private String filter;
+
   public ListingAdapter(Context context, JSONArray data, int resource, String[] from, int[] to, String idColumnName) {
     super(context, null, resource, from, to);
     this.data = data;
+    this.originalData = data;
     this.ctx = context;
     imageLoader = new ImageLoader(context);
     this.idColumnName = idColumnName;
   }
+
+  /**
+   * Filter the original results using the filter param, this doesnt invoke a rest call.
+   * @param filter
+   */
+  @TargetApi(Build.VERSION_CODES.KITKAT)
+  public void filterData(String filter) throws JSONException {
+    if(filter == null || filter.trim().length() == 0){
+      this.data = originalData;
+    } else {
+      this.data = new JSONArray();
+      for(int i=0 ; i<this.originalData.length() ; i++){
+        JSONObject jsonObject = ((JSONObject) originalData.get(i));
+        if(jsonObject.getString("title").toUpperCase().contains(filter.toUpperCase())){
+          this.data.put(jsonObject);
+        }
+      }
+    }
+
+    notifyDataSetChanged();
+  }
+
 
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
@@ -104,7 +119,6 @@ public class ListingAdapter extends SimpleAdapter {
 
   @Override
   public long getItemId(int position) {
-    // TODO Auto-generated method stub
     try {
       return ((Integer)((JSONObject)data.get(position)).get(idColumnName)).longValue();
     } catch (JSONException e) {

@@ -10,10 +10,10 @@
   android:paddingRight="@dimen/activity_horizontal_margin"
   android:paddingTop="@dimen/activity_vertical_margin"
   app:layout_behavior="@string/appbar_scrolling_view_behavior"
-  tools:context="com.meccaartwork.etsystats.QuickAccess"
-  tools:showIn="@layout/activity_quick_access">
-  <ListView android:id="@+id/quickAccess"
+  tools:context="com.meccaartwork.etsystats.CategoryListings"
+  tools:showIn="@layout/activity_category_listing">
+
+  <ListView android:id="@+id/listing"
     android:layout_width="match_parent"
     android:layout_height="match_parent"></ListView>
-
 </RelativeLayout>

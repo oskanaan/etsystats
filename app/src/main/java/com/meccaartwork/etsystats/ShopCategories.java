@@ -26,7 +26,6 @@ import java.util.List;
 
 public class ShopCategories extends AppCompatActivity {
 
-  List<JSONObject> data = new ArrayList<JSONObject>();
   ListingAdapter adapter;
 
   @Override
@@ -87,6 +86,12 @@ public class ShopCategories extends AppCompatActivity {
       }
       super.onPostExecute(o);
       JSONArray returnedData = (JSONArray) o;
+      //Add non categorized section
+      try {
+        returnedData.put(new JSONObject("{shop_section_id:"+Constants.NO_CATEGORY+", title:\"No category\"}"));
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
       adapter = new ListingAdapter(ShopCategories.this, returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
       ((ListView)ShopCategories.this.findViewById(R.id.shopCategories)).setAdapter(adapter);
 

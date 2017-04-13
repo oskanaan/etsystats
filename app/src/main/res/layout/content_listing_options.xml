@@ -18,41 +18,21 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:text="@string/favourite"/>
-    <android.support.design.widget.TextInputLayout
-      android:id="@+id/firstSearchTermLayout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
 
-      <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:id="@+id/firstSearchTerm"
-        android:hint="@string/hint_search_term1"/>
 
-    </android.support.design.widget.TextInputLayout>
+    <Button
+      android:id="@+id/refreshResult"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Refresh"/>
 
-    <android.support.design.widget.TextInputLayout
-      android:id="@+id/secondSearchTermLayout"
+    <android.support.v7.widget.LinearLayoutCompat
       android:layout_width="match_parent"
-      android:layout_height="wrap_content">
-      <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:id="@+id/secondSearchTerm"
-        android:hint="@string/hint_search_term2"/>
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-      android:id="@+id/thirdSearchTermLayout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
-      <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:id="@+id/thirdSearchTerm"
-        android:hint="@string/hint_search_term3"/>
-    </android.support.design.widget.TextInputLayout>
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:id="@+id/rankDisplay">
+
+    </android.support.v7.widget.LinearLayoutCompat>
+
   </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

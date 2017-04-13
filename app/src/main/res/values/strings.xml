@@ -1,6 +1,7 @@
 <resources>
-  <string name="app_name">EtsyStats</string>
+  <string name="app_name">Etsy Stats</string>
   <string name="action_settings">Settings</string>
+  <string name="err_greater_than_200">Greater than 200</string>
   <string name="title_activity_settings">Settings</string>
 
   <!-- Strings related to Settings -->
@@ -13,57 +14,14 @@
   <string name="error_please_setup_your_shop">Your shop has not been set. Use the settings menu to enter your shop name.</string>
   <string name="shop_found_and_id_saved">We\'ve found your shop on Etsy. Your shop name has been set and shop ID retrieved.</string>
   <string name="title_activity_my_items">MyItems</string>
-  <string name="title_activity_shop_categories">ShopCategories</string>
+  <string name="title_activity_shop_categories">Shop Categories</string>
   <string name="title_activity_category_listings">Listings</string>
-  <string name="title_activity_listing_options">ListingOptions</string>
-  <string name="hint_search_term1">Search Term 1</string>
-  <string name="hint_search_term2">Search Term 2</string>
-  <string name="hint_search_term3">Search Term 3</string>
-  <string name="favourite">Favourite</string>
+  <string name="title_activity_listing_options">Listing Options</string>
+  <string name="hint_search_term">Search Term</string>
+  <string name="favourite">Quick Access</string>
+  <string name="search_title">Search</string>
+  <string name="search_hint">Search term</string>
+  <string name="hint_search_term_rank">Rank</string>
 
 
-  <!--<string name="pref_title_add_friends_to_messages">Add friends to messages</string>-->
-  <!--<string-array name="pref_example_list_titles">-->
-  <!--<item>Always</item>-->
-  <!--<item>When possible</item>-->
-  <!--<item>Never</item>-->
-  <!--</string-array>-->
-  <!--<string-array name="pref_example_list_values">-->
-  <!--<item>1</item>-->
-  <!--<item>0</item>-->
-  <!--<item>-1</item>-->
-  <!--</string-array>-->
-
-  <!-- Example settings for Data & Sync -->
-  <!--<string name="pref_header_data_sync">Data &amp; sync</string>-->
-
-  <!--<string name="pref_title_sync_frequency">Sync frequency</string>-->
-  <!--<string-array name="pref_sync_frequency_titles">-->
-  <!--<item>15 minutes</item>-->
-  <!--<item>30 minutes</item>-->
-  <!--<item>1 hour</item>-->
-  <!--<item>3 hours</item>-->
-  <!--<item>6 hours</item>-->
-  <!--<item>Never</item>-->
-  <!--</string-array>-->
-  <!--<string-array name="pref_sync_frequency_values">-->
-  <!--<item>15</item>-->
-  <!--<item>30</item>-->
-  <!--<item>60</item>-->
-  <!--<item>180</item>-->
-  <!--<item>360</item>-->
-  <!--<item>-1</item>-->
-  <!--</string-array>-->
-
-  <!--<string name="pref_title_system_sync_settings">System sync settings</string>-->
-
-  <!-- Example settings for Notifications -->
-  <!--<string name="pref_header_notifications">Notifications</string>-->
-
-  <!--<string name="pref_title_new_message_notifications">New message notifications</string>-->
-
-  <!--<string name="pref_title_ringtone">Ringtone</string>-->
-  <!--<string name="pref_ringtone_silent">Silent</string>-->
-
-  <!--<string name="pref_title_vibrate">Vibrate</string>-->
 </resources>
