@@ -101,8 +101,11 @@ public class ListingOptions extends AppCompatActivity {
       parentViews.add(rankItemsParent);
       layout.addView(rankItemsParent, i-1 );
       final EditText searchTerm = (EditText) rankItemsParent.findViewById(R.id.searchTerm);
+      final TextView searchTermRank = (TextView) rankItemsParent.findViewById(R.id.searchTermRank);
       searchTerm.addTextChangedListener(new PreferenceTextChangeListener(searchTerm, i, listingId, "SearchTerm"));
+      searchTermRank.addTextChangedListener(new PreferenceTextChangeListener(searchTermRank, i, listingId, "SearchTermRank"));
       searchTerm.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("SearchTerm" + listingId +i, ""));
+      searchTermRank.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("SearchTermRank" + listingId +i, ""));
     }
 
     findViewById(R.id.refreshResult).setOnClickListener(new View.OnClickListener() {

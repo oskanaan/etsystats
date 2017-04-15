@@ -22,6 +22,7 @@
   <string name="search_title">Search</string>
   <string name="search_hint">Search term</string>
   <string name="hint_search_term_rank">Rank</string>
+  <string name="title_activity_main">Main</string>
 
 
 </resources>

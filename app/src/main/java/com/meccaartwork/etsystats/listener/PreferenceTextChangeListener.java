@@ -3,6 +3,7 @@ package com.meccaartwork.etsystats.listener;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 
 import com.meccaartwork.etsystats.ListingOptions;
@@ -12,12 +13,12 @@ import com.meccaartwork.etsystats.ListingOptions;
  */
 
 public class PreferenceTextChangeListener implements TextWatcher {
-  EditText editText;
+  View editText;
   int index;
   String prefix;
   String listingId;
 
-  public PreferenceTextChangeListener(EditText item, int index, String listingId, String prefix){
+  public PreferenceTextChangeListener(View item, int index, String listingId, String prefix){
     this.editText = item;
     this.index = index;
     this.listingId = listingId;
