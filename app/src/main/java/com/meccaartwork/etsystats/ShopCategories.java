@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
@@ -42,7 +43,7 @@ public class ShopCategories extends AppCompatActivity {
         if(adapter != null){
           Bundle bundle = new Bundle();
           try {
-            bundle.putString(Constants.SECTION_ID, obj.getString("shop_section_id"));
+            bundle.putInt(Constants.SECTION_ID, obj.getInt("shop_section_id"));
           } catch (JSONException e) {
             e.printStackTrace();
           }
@@ -71,12 +72,8 @@ public class ShopCategories extends AppCompatActivity {
 
     @Override
     protected Object doInBackground(Object[] params) {
-      String shopId = EtsyUtils.getShopId(ShopCategories.this);
-
-      String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
-      JSONArray sections = EtsyUtils.getResultsFromUrl(url);
-
-     return sections;
+      int shopId = EtsyUtils.getShopId(ShopCategories.this);
+      return EtsyApi.getShopCategories(shopId);
     }
 
     @Override

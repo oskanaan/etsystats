@@ -17,8 +17,24 @@
     <CheckBox android:id="@+id/favourite"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:layout_marginLeft="@dimen/text_margin"
               android:text="@string/favourite"/>
 
+    <android.support.v7.widget.LinearLayoutCompat
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="@dimen/text_margin"
+      android:orientation="horizontal">
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/refresh_period"/>
+      <Spinner
+        android:id="@+id/autoRefreshPeriod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/notifyPeriod"/>
+    </android.support.v7.widget.LinearLayoutCompat>
 
     <Button
       android:id="@+id/refreshResult"

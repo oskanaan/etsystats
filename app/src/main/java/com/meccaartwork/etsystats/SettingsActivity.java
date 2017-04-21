@@ -5,7 +5,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -20,9 +22,13 @@ import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.Toast;
 
+import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -169,7 +175,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
           try {
-            return EtsyUtils.storeShopIdFromName(getActivity(), newValue.toString());
+            return storeShopIdFromName(getActivity(), newValue.toString());
           } catch (IOException e) {
             e.printStackTrace();
           } catch (JSONException e) {
@@ -220,5 +226,45 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
       }
       return super.onOptionsItemSelected(item);
     }
+  }
+
+  public static boolean storeShopIdFromName(final Context context, final String name) throws IOException, JSONException {
+    new AsyncTask(){
+
+      private int shopId;
+      @Override
+      protected Object doInBackground(Object[] params) {
+        return EtsyApi.getShopData(name);
+      }
+
+      @Override
+      protected void onPostExecute(Object o) {
+        JSONArray listings = (JSONArray)o;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (listings.length() > 1){
+          Toast.makeText(context, R.string.error_multiple_shops_with_similar_name, Toast.LENGTH_LONG).show();
+          prefs.edit().putString("shop_name", null).commit();
+          prefs.edit().putInt("shop_id", -1).commit();
+
+        }
+        else if(listings.length() == 0){
+          Toast.makeText(context, R.string.error_no_shop_with_similar_name,Toast.LENGTH_LONG).show();
+          prefs.edit().putString("shop_name", null).commit();
+          prefs.edit().putInt("shop_id", -1).commit();
+        }
+        else{
+          try {
+            prefs.edit().putInt("shop_id", ((JSONObject) listings.get(0)).getInt("shop_id")).commit();
+            shopId = ((JSONObject) listings.get(0)).getInt("shop_id");
+            Toast.makeText(context, R.string.shop_found_and_id_saved, Toast.LENGTH_LONG).show();
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    }.execute();
+
+
+    return true;
   }
 }

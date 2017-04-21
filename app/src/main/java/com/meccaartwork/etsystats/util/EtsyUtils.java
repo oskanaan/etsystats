@@ -12,6 +12,8 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.meccaartwork.etsystats.R;
+import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +27,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 /**
@@ -32,57 +35,20 @@ import java.util.Objects;
  */
 public class EtsyUtils {
 
-  private static String shopId;
+  private static int shopId = -1;
 
-  public static boolean storeShopIdFromName(final Context context, final String name) throws IOException, JSONException {
-    new AsyncTask(){
+  public static SimpleDateFormat getPreferenceDateFormat(){
+    return new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-      private String shopId;
-      @Override
-      protected Object doInBackground(Object[] params) {
-        String url = "https://openapi.etsy.com/v2/shops?api_key=z5u6dzy42ve0vsdfyhhgrf98&shop_name="+name;
-
-        return getResultsFromUrl(url);
-      }
-
-      @Override
-      protected void onPostExecute(Object o) {
-        JSONArray listings = (JSONArray)o;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (listings.length() > 1){
-          Toast.makeText(context, R.string.error_multiple_shops_with_similar_name, Toast.LENGTH_LONG).show();
-          prefs.edit().putString("shop_name", null).commit();
-          prefs.edit().putString("shop_id", null).commit();
-
-        }
-        else if(listings.length() == 0){
-          Toast.makeText(context, R.string.error_no_shop_with_similar_name,Toast.LENGTH_LONG).show();
-          prefs.edit().putString("shop_name", null).commit();
-          prefs.edit().putString("shop_id", null).commit();
-        }
-        else{
-          try {
-            prefs.edit().putString("shop_id", ((JSONObject) listings.get(0)).getString("shop_id")).commit();
-            shopId = ((JSONObject) listings.get(0)).getString("shop_id");
-            Toast.makeText(context, R.string.shop_found_and_id_saved, Toast.LENGTH_LONG).show();
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-        }
-      }
-    }.execute();
-
-
-    return true;
   }
 
-  public static String getShopId(Context context){
-    if(shopId != null){
+  public static int getShopId(Context context){
+    if(shopId != -1){
       return shopId;
     }
     else{
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-      return prefs.getString("shop_id", null);
+      return prefs.getInt("shop_id", -1);
     }
 
   }
@@ -96,24 +62,41 @@ public class EtsyUtils {
     return sb.toString();
   }
 
-  public static JSONArray getResultsFromUrl(String url){
+  public static JSONObject getDataFromUrl(String url){
     JSONObject json = null;
     InputStream is = null;
-    int resultCount = -1;
-    JSONArray listings = null;
     try {
       is = new URL(url).openStream();
       BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
       String jsonText = EtsyUtils.readAll(rd);
       json = new JSONObject(jsonText);
-      listings = (JSONArray) json.get("results");
     } catch (IOException e) {
       e.printStackTrace();
     } catch (JSONException e) {
       e.printStackTrace();
     }
 
-    return listings;
+    return json;
+  }
+
+  public static JSONArray getResults(JSONObject jsonObject){
+    try {
+      return (JSONArray) jsonObject.get("results");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  public static JSONArray getResultsFromUrl(String url){
+    try {
+      return (JSONArray) getDataFromUrl(url).get("results");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return null;
   }
 
   public static Drawable drawableFromUrl(Resources resources, String url) throws IOException {
@@ -125,5 +108,23 @@ public class EtsyUtils {
 
     x = BitmapFactory.decodeStream(input);
     return new BitmapDrawable(resources, x);
+  }
+
+  public static int getRefreshPeriodInHours(Context context, String listingId){
+    int position = PreferenceManager.getDefaultSharedPreferences(context).getInt(PreferenceNameHelper.getPeriodPrefixName(listingId), -1);
+    switch(position){
+      case -1:
+        return -1;
+      case 0:
+        return 1;
+      case 1:
+        return 24;
+      case 2:
+        return 48;
+      case 3:
+        return 24*7;
+      default:
+        return -1;
+    }
   }
 }

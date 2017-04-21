@@ -1,5 +1,6 @@
 package com.meccaartwork.etsystats.listener;
 
+import android.content.Context;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -7,22 +8,19 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.meccaartwork.etsystats.ListingOptions;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 
 /**
  * Created by oskanaan on 13/04/17.
  */
 
 public class PreferenceTextChangeListener implements TextWatcher {
-  View editText;
-  int index;
-  String prefix;
-  String listingId;
+  Context context;
+  String preferenceId;
 
-  public PreferenceTextChangeListener(View item, int index, String listingId, String prefix){
-    this.editText = item;
-    this.index = index;
-    this.listingId = listingId;
-    this.prefix = prefix;
+  public PreferenceTextChangeListener(Context context, String preferenceId){
+    this.context = context;
+    this.preferenceId = preferenceId;
   }
 
   @Override
@@ -37,8 +35,6 @@ public class PreferenceTextChangeListener implements TextWatcher {
 
   @Override
   public void afterTextChanged(Editable s) {
-    String preferenceId = prefix+listingId+index;
-    PreferenceManager.getDefaultSharedPreferences(editText.getContext())
-        .edit().putString(preferenceId, s.toString()).commit();
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(preferenceId, s.toString()).commit();
   }
 }

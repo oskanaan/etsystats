@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
@@ -28,7 +29,7 @@ import java.util.List;
 public class CategoryListings extends AppCompatActivity {
 
   ListingAdapter adapter;
-  String categoryId;
+  int categoryId;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,7 +71,7 @@ public class CategoryListings extends AppCompatActivity {
     super.onCreate(savedInstanceState);
 
     Bundle bundle = getIntent().getExtras();
-    categoryId = bundle.getString(Constants.SECTION_ID);
+    categoryId = bundle.getInt(Constants.SECTION_ID);
 
     setContentView(R.layout.activity_category_listing);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -105,30 +106,8 @@ public class CategoryListings extends AppCompatActivity {
 
     @Override
     protected Object doInBackground(Object[] params) {
-      String shopId = EtsyUtils.getShopId(CategoryListings.this);
-
-      JSONArray sections;
-      if(Integer.parseInt(categoryId) == Constants.NO_CATEGORY){
-        String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
-        JSONArray allListings = EtsyUtils.getResultsFromUrl(url);
-        sections = new JSONArray();
-        for(int i=0 ; i < allListings.length() ; i++){
-          JSONObject jsonObject = null;
-          try {
-            jsonObject = ((JSONObject) allListings.get(i));
-            if(jsonObject.get("shop_section_id") == JSONObject.NULL){
-              sections.put(jsonObject);
-            }
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-        }
-      } else {
-        String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections/"+categoryId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
-        sections = EtsyUtils.getResultsFromUrl(url);
-      }
-
-      return sections;
+      int shopId = EtsyUtils.getShopId(CategoryListings.this);
+      return EtsyApi.getCategoryListings(shopId, categoryId);
     }
 
     @Override

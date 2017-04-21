@@ -28,16 +28,19 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.meccaartwork.etsystats.async.RetrieveRankAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.listener.PreferenceTextChangeListener;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 import com.meccaartwork.etsystats.util.ImageHelper;
@@ -66,7 +69,8 @@ public class ListingOptions extends AppCompatActivity {
     listingImage.setBackgroundColor(Color.TRANSPARENT);
 
     final EditText listingTitle = (EditText) findViewById(R.id.listingTitle);
-    listingTitle.setText(bundle.getString(Constants.LISTING_TITLE));
+    String listingTitleText = bundle.getString(Constants.LISTING_TITLE);
+    listingTitle.setText(listingTitleText.substring(0,Math.min(100, listingTitleText.length()))+(listingTitleText.length()>=100?"...":""));
 
     new AsyncTask(){
 
@@ -96,16 +100,16 @@ public class ListingOptions extends AppCompatActivity {
     LinearLayoutCompat layout = (LinearLayoutCompat)findViewById(R.id.rankDisplay);
     LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    for(int i=1 ; i<4 ; i++){
+    for(int i=1 ; i<Constants.MAX_SEARCH_TERMS ; i++){
       View rankItemsParent = layoutInflater.inflate(R.layout.listing_rank_display, layout, false);
       parentViews.add(rankItemsParent);
       layout.addView(rankItemsParent, i-1 );
       final EditText searchTerm = (EditText) rankItemsParent.findViewById(R.id.searchTerm);
       final TextView searchTermRank = (TextView) rankItemsParent.findViewById(R.id.searchTermRank);
-      searchTerm.addTextChangedListener(new PreferenceTextChangeListener(searchTerm, i, listingId, "SearchTerm"));
-      searchTermRank.addTextChangedListener(new PreferenceTextChangeListener(searchTermRank, i, listingId, "SearchTermRank"));
-      searchTerm.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("SearchTerm" + listingId +i, ""));
-      searchTermRank.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("SearchTermRank" + listingId +i, ""));
+      searchTerm.addTextChangedListener(new PreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermName(listingId, i)));
+      searchTermRank.addTextChangedListener(new PreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermRankName(listingId, i)));
+      searchTerm.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(PreferenceNameHelper.getSearchTermName(listingId, i), ""));
+      searchTermRank.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(PreferenceNameHelper.getSearchTermRankName(listingId, i) , ""));
     }
 
     findViewById(R.id.refreshResult).setOnClickListener(new View.OnClickListener() {
@@ -122,16 +126,40 @@ public class ListingOptions extends AppCompatActivity {
       }
     });
 
+    final Spinner spinner = (Spinner) findViewById(R.id.autoRefreshPeriod);
+    final String preferenceId = PreferenceNameHelper.getPeriodPrefixName(listingId);
+
+    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        PreferenceManager.getDefaultSharedPreferences(view.getContext())
+            .edit().putInt(preferenceId, position).commit();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+        PreferenceManager.getDefaultSharedPreferences(spinner.getContext())
+            .edit().putInt(preferenceId, 4).commit();
+      }
+    });
+
+    int selectedRefreshPeriod = PreferenceManager.getDefaultSharedPreferences(spinner.getContext()).getInt(preferenceId, 4);
+    spinner.setSelection(selectedRefreshPeriod);
+
 
     CheckBox favourite = (CheckBox)findViewById(R.id.favourite);
-    favourite.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("Favourite"+listingId, false));
+    favourite.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferenceNameHelper.getFavouriteName(listingId), false));
 
     favourite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        PreferenceManager.getDefaultSharedPreferences(ListingOptions.this).edit().putBoolean("Favourite"+listingId, isChecked).commit();
+        PreferenceManager.getDefaultSharedPreferences(ListingOptions.this).edit().putBoolean(PreferenceNameHelper.getFavouriteName(listingId), isChecked).commit();
       }
     });
+
+    
   }
+
+
 
 }

@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
@@ -96,16 +97,16 @@ public class QuickAccess extends AppCompatActivity {
 
     @Override
     protected Object doInBackground(Object[] params) {
-      String shopId = EtsyUtils.getShopId(QuickAccess.this);
+      int shopId = EtsyUtils.getShopId(QuickAccess.this);
 
-      String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key=z5u6dzy42ve0vsdfyhhgrf98&includes=Images:1";
+      String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key="+Constants.API_KEY+"&includes=Images:1";
       JSONArray listings = EtsyUtils.getResultsFromUrl(url);
       JSONArray quickAccessListings = new JSONArray();
 
       for(int i=0 ; i<listings.length() ; i++){
         try {
           JSONObject jsonObject = listings.getJSONObject(i);
-          if(PreferenceManager.getDefaultSharedPreferences(QuickAccess.this).getBoolean("Favourite"+jsonObject.getString("listing_id"), false)){
+          if(PreferenceManager.getDefaultSharedPreferences(QuickAccess.this).getBoolean(PreferenceNameHelper.getFavouriteName(jsonObject.getString("listing_id")), false)){
             quickAccessListings.put(jsonObject);
           }
         } catch (JSONException e) {

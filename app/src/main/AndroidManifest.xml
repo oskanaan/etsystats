@@ -12,6 +12,8 @@
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.CAMERA"/>
   <uses-permission android:name="android.permission.READ_CONTACTS"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
 
   <application
     android:allowBackup="true"
@@ -56,6 +58,18 @@
       </intent-filter>
 
     </activity>
+    <service
+      android:name=".jobs.RefreshListingRank"
+      android:exported="true"
+      android:enabled="true"
+      android:permission="android.permission.BIND_JOB_SERVICE"/>
+    <receiver android:name=".jobs.BootBroadcastReceiver" android:enabled="true" android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+        <category android:name="android.intent.category.HOME" />
+      </intent-filter>
+    </receiver>
   </application>
 
 </manifest>
