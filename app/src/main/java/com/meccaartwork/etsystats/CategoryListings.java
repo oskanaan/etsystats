@@ -4,10 +4,13 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -66,6 +69,7 @@ public class CategoryListings extends AppCompatActivity {
   }
 
 
+  @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -74,8 +78,8 @@ public class CategoryListings extends AppCompatActivity {
     categoryId = bundle.getInt(Constants.SECTION_ID);
 
     setContentView(R.layout.activity_category_listing);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
+    ListView categoryListings = ((ListView)findViewById(R.id.categoryListings));
+    categoryListings.setEmptyView(findViewById(R.id.noResults));
 
     new AsyncLoadData().execute();
 
@@ -88,7 +92,7 @@ public class CategoryListings extends AppCompatActivity {
           try {
             bundle.putString(Constants.LISTING_ID, obj.getString("listing_id"));
             bundle.putString(Constants.LISTING_TITLE, obj.getString("title"));
-              bundle.putString(Constants.LISTING_IMAGE_URL, ((JSONObject) ((JSONArray)obj.get("Images")).get(0)).getString("url_570xN"));
+            bundle.putString(Constants.LISTING_IMAGE_URL, ((JSONObject) ((JSONArray)obj.get("Images")).get(0)).getString("url_570xN"));
           } catch (JSONException e) {
             e.printStackTrace();
           }

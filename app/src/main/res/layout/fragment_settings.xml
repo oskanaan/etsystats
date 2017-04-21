@@ -1,0 +1,39 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.meccaartwork.etsystats.Settings">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp">
+
+    <EditText
+      android:id="@+id/shopName"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:ems="10"
+      android:hint="@string/shop_name_input"
+      android:inputType="textPersonName"
+      android:paddingTop="16dp"/>
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingTop="16dp"
+      android:textSize="18sp"/>
+
+    <ImageView
+      android:id="@+id/shopIcon"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingLeft="-16dp"
+      android:paddingTop="16dp"
+      app:srcCompat="@drawable/stub"/>
+  </LinearLayout>
+
+</FrameLayout>

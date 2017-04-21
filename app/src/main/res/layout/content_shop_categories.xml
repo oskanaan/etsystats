@@ -10,8 +10,7 @@
   android:paddingRight="@dimen/activity_horizontal_margin"
   android:paddingTop="@dimen/activity_vertical_margin"
   app:layout_behavior="@string/appbar_scrolling_view_behavior"
-  tools:context="com.meccaartwork.etsystats.ShopCategories"
-  tools:showIn="@layout/activity_shop_categories">
+  tools:context="com.meccaartwork.etsystats.ShopCategories">
 
   <ListView android:id="@+id/shopCategories"
     android:layout_width="match_parent"

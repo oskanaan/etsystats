@@ -28,17 +28,17 @@
     <activity
       android:name=".QuickAccess"
       android:label="@string/title_activity_my_items"
-      android:theme="@style/AppTheme.NoActionBar">
+      android:theme="@style/AppTheme">
     </activity>
     <activity
       android:name=".ShopCategories"
       android:label="@string/title_activity_shop_categories"
-      android:theme="@style/AppTheme.NoActionBar">
+      android:theme="@style/AppTheme">
     </activity>
     <activity
       android:name=".CategoryListings"
       android:label="@string/title_activity_category_listings"
-      android:theme="@style/AppTheme.NoActionBar">
+      android:theme="@style/AppTheme">
       <meta-data
         android:name="android.app.searchable"
         android:resource="@xml/searchable"/>
@@ -46,12 +46,12 @@
     <activity
       android:name=".ListingOptions"
       android:label="@string/title_activity_listing_options"
-      android:theme="@style/AppTheme.NoActionBar">
+      android:theme="@style/AppTheme">
     </activity>
     <activity
       android:name=".Main"
       android:label="@string/title_activity_main"
-      android:theme="@style/AppTheme.NoActionBar">
+      android:theme="@style/AppTheme">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>

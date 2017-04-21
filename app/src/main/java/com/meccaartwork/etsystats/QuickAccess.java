@@ -1,42 +1,36 @@
 package com.meccaartwork.etsystats;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
 import com.meccaartwork.etsystats.data.Constants;
-import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class QuickAccess extends AppCompatActivity {
+public class QuickAccess extends Fragment {
 
   ListingAdapter adapter;
 
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_quick_access);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    new AsyncLoadData().execute();
+    View root = inflater.inflate(R.layout.content_my_items, container, false);
 
-    ((ListView)QuickAccess.this.findViewById(R.id.quickAccess)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    new AsyncLoadData().execute(root);
+
+    ((ListView)root.findViewById(R.id.quickAccess)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         JSONObject obj = (JSONObject) parent.getAdapter().getItem(position);
@@ -57,30 +51,32 @@ public class QuickAccess extends AppCompatActivity {
         }
       }
     });
+
+    return root;
   }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater inflater = getMenuInflater();
-    inflater.inflate(R.menu.options_menu, menu);
-
-    // Associate searchable configuration with the SearchView
-    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-      @Override
-      public boolean onQueryTextSubmit(String query) {
-        return reloadResults(query);
-      }
-
-      @Override
-      public boolean onQueryTextChange(String newText) {
-        return reloadResults(newText);
-      }
-    });
-    return true;
-  }
+//  @Override
+//  public boolean onCreateOptionsMenu(Menu menu) {
+//    MenuInflater inflater = getMenuInflater();
+//    inflater.inflate(R.menu.options_menu, menu);
+//
+//    // Associate searchable configuration with the SearchView
+//    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+//    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//      @Override
+//      public boolean onQueryTextSubmit(String query) {
+//        return reloadResults(query);
+//      }
+//
+//      @Override
+//      public boolean onQueryTextChange(String newText) {
+//        return reloadResults(newText);
+//      }
+//    });
+//    return true;
+//  }
 
   private boolean reloadResults(String text) {
     try {
@@ -95,9 +91,11 @@ public class QuickAccess extends AppCompatActivity {
 
   private class AsyncLoadData extends AsyncTask {
 
+    private View view;
     @Override
     protected Object doInBackground(Object[] params) {
-      int shopId = EtsyUtils.getShopId(QuickAccess.this);
+      this.view = (View) params[0];
+      int shopId = EtsyUtils.getShopId(getContext());
 
       String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key="+Constants.API_KEY+"&includes=Images:1";
       JSONArray listings = EtsyUtils.getResultsFromUrl(url);
@@ -106,7 +104,7 @@ public class QuickAccess extends AppCompatActivity {
       for(int i=0 ; i<listings.length() ; i++){
         try {
           JSONObject jsonObject = listings.getJSONObject(i);
-          if(PreferenceManager.getDefaultSharedPreferences(QuickAccess.this).getBoolean(PreferenceNameHelper.getFavouriteName(jsonObject.getString("listing_id")), false)){
+          if(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("Favourite"+jsonObject.getString("listing_id"), false)){
             quickAccessListings.put(jsonObject);
           }
         } catch (JSONException e) {
@@ -124,8 +122,8 @@ public class QuickAccess extends AppCompatActivity {
       }
       super.onPostExecute(o);
       JSONArray returnedData = (JSONArray) o;
-      adapter = new ListingAdapter(QuickAccess.this, returnedData, R.layout.etsy_listing, null, null, "listing_id");
-      ((ListView)QuickAccess.this.findViewById(R.id.quickAccess)).setAdapter(adapter);
+      adapter = new ListingAdapter(getContext(), returnedData, R.layout.etsy_listing, null, null, "listing_id");
+      ((ListView)view.findViewById(R.id.quickAccess)).setAdapter(adapter);
     }
   }
 

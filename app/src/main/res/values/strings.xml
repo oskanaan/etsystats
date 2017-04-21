@@ -2,7 +2,7 @@
   <string name="app_name">Etsy Monitor</string>
   <string name="action_settings">Settings</string>
   <string name="err_greater_than_200">Greater than 200</string>
-  <string name="title_activity_settings">Settings</string>
+  <string name="title_activity_settings">Shop Settings</string>
 
   <!-- Strings related to Settings -->
 
@@ -14,7 +14,7 @@
   <string name="error_please_setup_your_shop">Your shop has not been set. Use the settings menu to enter your shop name.</string>
   <string name="shop_found_and_id_saved">We\'ve found your shop on Etsy. Your shop name has been set and shop ID retrieved.</string>
   <string name="title_activity_my_items">MyItems</string>
-  <string name="title_activity_shop_categories">Shop Categories</string>
+  <string name="title_activity_shop_categories">Sections</string>
   <string name="title_activity_category_listings">Listings</string>
   <string name="title_activity_listing_options">Listing Options</string>
   <string name="hint_search_term">Search Term</string>
@@ -24,6 +24,8 @@
   <string name="hint_search_term_rank">Rank</string>
   <string name="title_activity_main">Etsy Monitor</string>
   <string name="refresh_period">Refresh results</string>
+  <string name="quick_access">Quick Access</string>
+  <string name="shop_name_input">Please enter your shop name</string>
 
   <string-array name="notifyPeriod">
     <item>Every Hour</item>

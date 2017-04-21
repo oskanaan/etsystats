@@ -1,15 +1,12 @@
 package com.meccaartwork.etsystats;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -22,21 +19,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ShopCategories extends AppCompatActivity {
+public class ShopCategories extends Fragment {
 
   ListingAdapter adapter;
 
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_shop_categories);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
+    View root = inflater.inflate(R.layout.content_shop_categories, container, false);
+    ListView shopCategories = (ListView) root.findViewById(R.id.shopCategories);
+    shopCategories.setEmptyView(inflater.inflate(R.layout.empty_list, container, false));
 
-    ((ListView)ShopCategories.this.findViewById(R.id.shopCategories)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    ((ListView)root.findViewById(R.id.shopCategories)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         JSONObject obj = (JSONObject)parent.getAdapter().getItem(position);
@@ -56,32 +50,27 @@ public class ShopCategories extends AppCompatActivity {
       }
     });
 
-    new AsyncLoadData().execute();
-
-//    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//    fab.setOnClickListener(new View.OnClickListener() {
-//      @Override
-//      public void onClick(View view) {
-//        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//            .setAction("Action", null).show();
-//      }
-//    });
+    new AsyncLoadData().execute(root);
+    return root;
   }
 
   private class AsyncLoadData extends AsyncTask {
 
+    private View view;
+
     @Override
     protected Object doInBackground(Object[] params) {
-      int shopId = EtsyUtils.getShopId(ShopCategories.this);
+      this.view = (View) params[0];
+      int shopId = EtsyUtils.getShopId(getContext());
       return EtsyApi.getShopCategories(shopId);
     }
 
     @Override
     protected void onPostExecute(Object o) {
-      if(o==null){
+      if(o == null){
         return;
       }
-      super.onPostExecute(o);
+
       JSONArray returnedData = (JSONArray) o;
       //Add non categorized section
       try {
@@ -89,9 +78,8 @@ public class ShopCategories extends AppCompatActivity {
       } catch (JSONException e) {
         e.printStackTrace();
       }
-      adapter = new ListingAdapter(ShopCategories.this, returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
-      ((ListView)ShopCategories.this.findViewById(R.id.shopCategories)).setAdapter(adapter);
-
+      adapter = new ListingAdapter(getContext(), returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
+      ((ListView)view.findViewById(R.id.shopCategories)).setAdapter(adapter);
     }
   }
 }
