@@ -2,10 +2,12 @@ package com.meccaartwork.etsystats.async;
 
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.meccaartwork.etsystats.R;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyApi;
 
 /**
@@ -39,13 +41,11 @@ public class RetrieveRankAsyncTask extends AsyncTask {
 
   @Override
   protected void onPostExecute(Object o) {
+    progressBar.setVisibility(View.GONE);
     if(o.equals(-1)){
       viewToUpdate.setText(R.string.err_greater_than_200);
     } else {
       viewToUpdate.setText(o.toString());
     }
-
-    progressBar.setVisibility(View.INVISIBLE);
-
   }
 }

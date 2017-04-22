@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
@@ -104,7 +105,7 @@ public class QuickAccess extends Fragment {
       for(int i=0 ; i<listings.length() ; i++){
         try {
           JSONObject jsonObject = listings.getJSONObject(i);
-          if(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("Favourite"+jsonObject.getString("listing_id"), false)){
+          if(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(PreferenceNameHelper.getFavouriteName(jsonObject.getString("listing_id")), false)){
             quickAccessListings.put(jsonObject);
           }
         } catch (JSONException e) {

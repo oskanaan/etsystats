@@ -127,4 +127,32 @@ public class EtsyUtils {
         return -1;
     }
   }
+
+  public static int compareRankToPrevious(Context context, String listingId, int index){
+    String currentRankPref = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferenceNameHelper.getSearchTermRankName(listingId, index), "");
+    String prevRankPref = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferenceNameHelper.getPreviousSearchTermRankName(listingId, index), "");
+    int currentRank = -1;
+    int prevRank = -1;
+    if(!currentRankPref.equals("")){
+      if(currentRankPref.equals(context.getString(R.string.err_greater_than_200))){
+        currentRank = 1000;
+      } else {
+        currentRank = Integer.parseInt(currentRankPref);
+      }
+    }
+    if(!prevRankPref.equals("")){
+      if(prevRankPref.equals(context.getString(R.string.err_greater_than_200))){
+        prevRank = 1000;
+      } else {
+        prevRank = Integer.parseInt(prevRankPref);
+      }
+    }
+    if(currentRank < prevRank){
+      return 1;
+    } else if(currentRank > prevRank){
+      return -1;
+    } else {
+      return 0;
+    }
+  }
 }

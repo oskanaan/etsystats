@@ -3,14 +3,11 @@ package com.meccaartwork.etsystats;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -18,20 +15,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
+import com.meccaartwork.etsystats.async.LoadCategoryListingsAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
-import com.meccaartwork.etsystats.util.EtsyApi;
-import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CategoryListings extends AppCompatActivity {
 
-  ListingAdapter adapter;
   int categoryId;
 
   @Override
@@ -59,7 +51,7 @@ public class CategoryListings extends AppCompatActivity {
 
   private boolean reloadResults(String text) {
     try {
-      adapter.filterData(text);
+      ((ListingAdapter)((ListView)findViewById(R.id.categoryListings)).getAdapter()).filterData(text);
     } catch (JSONException e) {
       e.printStackTrace();
       return false;
@@ -80,13 +72,15 @@ public class CategoryListings extends AppCompatActivity {
     setContentView(R.layout.activity_category_listing);
     ListView categoryListings = ((ListView)findViewById(R.id.categoryListings));
     categoryListings.setEmptyView(findViewById(R.id.noResults));
+    View loadingView = findViewById(R.id.loadingPanel);
 
-    new AsyncLoadData().execute();
+    new LoadCategoryListingsAsyncTask(this, loadingView, categoryId).execute();
 
     ((ListView)CategoryListings.this.findViewById(R.id.categoryListings)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         JSONObject obj = (JSONObject) parent.getAdapter().getItem(position);
+        ListingAdapter adapter = ((ListingAdapter)((ListView)findViewById(R.id.categoryListings)).getAdapter());
         if (adapter != null) {
           Bundle bundle = new Bundle();
           try {
@@ -106,23 +100,4 @@ public class CategoryListings extends AppCompatActivity {
     });
   }
 
-  private class AsyncLoadData extends AsyncTask {
-
-    @Override
-    protected Object doInBackground(Object[] params) {
-      int shopId = EtsyUtils.getShopId(CategoryListings.this);
-      return EtsyApi.getCategoryListings(shopId, categoryId);
-    }
-
-    @Override
-    protected void onPostExecute(Object o) {
-      if(o==null){
-        return;
-      }
-      super.onPostExecute(o);
-      JSONArray returnedData = (JSONArray) o;
-      adapter = new ListingAdapter(CategoryListings.this, returnedData, R.layout.etsy_listing, null, null, "listing_id");
-      ((ListView)CategoryListings.this.findViewById(R.id.categoryListings)).setAdapter(adapter);
-    }
-  }
 }

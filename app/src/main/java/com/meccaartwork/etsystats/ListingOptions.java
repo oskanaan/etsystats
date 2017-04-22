@@ -42,6 +42,7 @@ import com.meccaartwork.etsystats.async.RetrieveRankAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.listener.PreferenceTextChangeListener;
+import com.meccaartwork.etsystats.listener.RankPreferenceTextChangeListener;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 import com.meccaartwork.etsystats.util.ImageHelper;
 
@@ -106,10 +107,23 @@ public class ListingOptions extends AppCompatActivity {
       layout.addView(rankItemsParent, i-1 );
       final EditText searchTerm = (EditText) rankItemsParent.findViewById(R.id.searchTerm);
       final TextView searchTermRank = (TextView) rankItemsParent.findViewById(R.id.searchTermRank);
-      searchTerm.addTextChangedListener(new PreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermName(listingId, i)));
-      searchTermRank.addTextChangedListener(new PreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermRankName(listingId, i)));
+      final ImageView inceaseImage = (ImageView) rankItemsParent.findViewById(R.id.increase);
+      final ImageView decreaseImage = (ImageView) rankItemsParent.findViewById(R.id.decrease);
+      int rankChange = EtsyUtils.compareRankToPrevious(getApplicationContext(),listingId, i);
+      if(rankChange == -1){
+        inceaseImage.setVisibility(View.GONE);
+        decreaseImage.setVisibility(View.VISIBLE);
+      } else if(rankChange == 1){
+        inceaseImage.setVisibility(View.VISIBLE);
+        decreaseImage.setVisibility(View.GONE);
+      } else {
+        inceaseImage.setVisibility(View.GONE);
+        decreaseImage.setVisibility(View.GONE);
+      }
       searchTerm.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(PreferenceNameHelper.getSearchTermName(listingId, i), ""));
       searchTermRank.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(PreferenceNameHelper.getSearchTermRankName(listingId, i) , ""));
+      searchTerm.addTextChangedListener(new PreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermName(listingId, i)));
+      searchTermRank.addTextChangedListener(new RankPreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermRankName(listingId, i), PreferenceNameHelper.getPreviousSearchTermRankName(listingId, i), inceaseImage, decreaseImage, listingId, i));
     }
 
     findViewById(R.id.refreshResult).setOnClickListener(new View.OnClickListener() {
@@ -159,7 +173,5 @@ public class ListingOptions extends AppCompatActivity {
 
     
   }
-
-
 
 }
