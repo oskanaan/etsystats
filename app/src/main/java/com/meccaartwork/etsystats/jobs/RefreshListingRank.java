@@ -1,13 +1,21 @@
 package com.meccaartwork.etsystats.jobs;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.meccaartwork.etsystats.Main;
 import com.meccaartwork.etsystats.R;
 import com.meccaartwork.etsystats.async.RetrieveRankAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
@@ -64,16 +72,16 @@ public class RefreshListingRank extends JobService {
         Log.d(this.getClass().getName(), "Got key : "+key);
         if(key.startsWith(Constants.REFRESH_PERIOD_PREFIX) && key.contains("#")){
           String listingId = key.split("#")[1];
-          if(!isRefreshDue(listingId)){
-            Log.d(this.getClass().getName(), "Refresh not due yet, continue with other items.");
-            continue;
-          }
           Log.d(this.getClass().getName(), "Refreshing ranks for listing ID: "+listingId);
           for(int i=1; i<Constants.MAX_SEARCH_TERMS; i++){
+            if(!isRefreshDue(listingId, i)){
+              Log.d(this.getClass().getName(), "Refresh not due yet, continue with other search terms.");
+              continue;
+            }
             String term = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(PreferenceNameHelper.getSearchTermName(listingId, i), null);
             Log.d(this.getClass().getName(), "Refreshing ranks for listing ID: "+listingId+", search term : "+term);
             if(term != null){
-              int rank = EtsyApi.getListingRank(listingId, term);
+              int rank = EtsyApi.getListingRank(getApplicationContext(), listingId, i);
               String previousRank = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(PreferenceNameHelper.getSearchTermRankName(listingId, i), null);
               if(previousRank != null){
                 Log.d(this.getClass().getName(), "Setting previous rank for listing "+listingId+" to "+previousRank);
@@ -89,7 +97,7 @@ public class RefreshListingRank extends JobService {
                   rankValue
               ).commit();
 
-              String preferenceId = PreferenceNameHelper.getSearchTermLastRefreshed(listingId);
+              String preferenceId = PreferenceNameHelper.getSearchTermLastRefreshed(listingId, i);
               PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(preferenceId, EtsyUtils.getPreferenceDateFormat().format(Calendar.getInstance().getTime())).commit();
 
             }
@@ -100,8 +108,8 @@ public class RefreshListingRank extends JobService {
       return null;
     }
 
-    private boolean isRefreshDue(String listingId) {
-      String preferenceId = PreferenceNameHelper.getSearchTermLastRefreshed(listingId);
+    private boolean isRefreshDue(String listingId, int index) {
+      String preferenceId = PreferenceNameHelper.getSearchTermLastRefreshed(listingId, index);
       String lastRefreshed = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(preferenceId, null);
       int refreshHours = EtsyUtils.getRefreshPeriodInHours(getApplicationContext(), listingId);
       Log.d(this.getClass().getName(), "Item last refreshed at "+lastRefreshed+", expected refresh is after "+refreshHours+" hours");
@@ -137,10 +145,28 @@ public class RefreshListingRank extends JobService {
 
       jobFinished(parameters, true);
       Log.d(this.getClass().getName(), "Job finished : "+parameters);
+
+      //Show a notification that the job is ready if the user has enabled it.
+      Boolean isShowPushNotifications = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("show_push_notifications", true);
+      if(isShowPushNotifications){
+        generateNotification(getApplicationContext());
+      }
     }
   }
 
   private boolean isJobAlreadyRun(){
     return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(JOB_RUN_PREFIX+Calendar.getInstance().get(Calendar.DATE), false);
+  }
+
+  private static void generateNotification(Context context) {
+    Intent intent = new Intent(context, Main.class);
+    intent.putExtra(Constants.FROM_NOTIFICATION, true);
+    NotificationManager mNotifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+    mBuilder.setContentTitle(context.getString(R.string.refresh_done))
+        .setContentText(context.getString(R.string.press_here_for_details))
+        .setSmallIcon(R.drawable.notification_icon)
+        .setContentIntent(PendingIntent.getActivity(context, 21330, intent, 0));
+    mNotifyManager.notify(21223, mBuilder.build());
   }
 }

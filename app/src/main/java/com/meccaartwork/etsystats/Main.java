@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
+import com.meccaartwork.etsystats.data.Constants;
+
 public class Main extends ActionBarActivity implements android.support.v7.app.ActionBar.TabListener {
 
   /**
@@ -75,6 +77,12 @@ public class Main extends ActionBarActivity implements android.support.v7.app.Ac
               .setText(mAppSectionsPagerAdapter.getPageTitle(i))
               .setTabListener(Main.this));
     }
+
+    Bundle bundle = getIntent().getExtras();
+    if(bundle != null && bundle.getBoolean(Constants.FROM_NOTIFICATION, false)){
+      mViewPager.setCurrentItem(3, true);
+
+    }
   }
 
   @Override
@@ -105,6 +113,8 @@ public class Main extends ActionBarActivity implements android.support.v7.app.Ac
           return new QuickAccess();
         case 2:
           return new ShopCategories();
+        case 3:
+          return new RankChangeFragment();
 
         default:
           return null;
@@ -113,7 +123,7 @@ public class Main extends ActionBarActivity implements android.support.v7.app.Ac
 
     @Override
     public int getCount() {
-      return 3;
+      return 4;
     }
 
     @Override
@@ -125,6 +135,8 @@ public class Main extends ActionBarActivity implements android.support.v7.app.Ac
           return Main.this.getApplicationContext().getString(R.string.quick_access);
         case 2:
           return Main.this.getApplicationContext().getString(R.string.title_activity_shop_categories);
+        case 3:
+          return getApplicationContext().getString(R.string.rank_change);
         default:
           return "";
       }

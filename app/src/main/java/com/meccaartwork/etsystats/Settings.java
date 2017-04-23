@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,10 +26,22 @@ public class Settings extends Fragment {
     final EditText shopName = (EditText) root.findViewById(R.id.shopName);
     final TextView shopTitleView = (TextView) root.findViewById(R.id.title);
     final ImageView imageView = (ImageView) root.findViewById(R.id.shopIcon);
+    final CheckBox pushNotificationsCheckbox = (CheckBox) root.findViewById(R.id.showPushNotification);
+
     String shopNameFromPrefs = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("shop_name", null);
     String shopTitleFromPrefs = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("shop_title", null);
+    Boolean showPushNotificationsPref = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("show_push_notifications", true);
+
     shopName.setText(shopNameFromPrefs);
     shopTitleView.setText(shopTitleFromPrefs);
+    pushNotificationsCheckbox.setChecked(showPushNotificationsPref);
+    pushNotificationsCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean("show_push_notifications", isChecked).commit();
+      }
+    });
+
     new LoadShopIconAsyncTask(getContext(), imageView).execute();
 
     shopName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
