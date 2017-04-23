@@ -12,8 +12,8 @@ public class PreferenceNameHelper {
     return Constants.SEARCH_TERM_RANK_PREFIX +"#"+ listingId +"#"+index;
   }
 
-  public static String getSearchTermLastRefreshed(String listingId){
-    return Constants.SEARCH_TERM_LAST_REFRESHED_PREFIX +"#"+ listingId ;
+  public static String getSearchTermLastRefreshed(String listingId, int index){
+    return Constants.SEARCH_TERM_LAST_REFRESHED_PREFIX +"#"+ listingId+"#"+index ;
   }
 
   public static String getPreviousSearchTermRankName(String listingId, int index){

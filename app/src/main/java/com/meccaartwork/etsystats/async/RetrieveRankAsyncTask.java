@@ -1,6 +1,8 @@
 package com.meccaartwork.etsystats.async;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -9,6 +11,9 @@ import android.widget.TextView;
 import com.meccaartwork.etsystats.R;
 import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyApi;
+import com.meccaartwork.etsystats.util.EtsyUtils;
+
+import java.util.Calendar;
 
 /**
  * Retrieves the rank based on the search term usedd
@@ -16,16 +21,18 @@ import com.meccaartwork.etsystats.util.EtsyApi;
 
 public class RetrieveRankAsyncTask extends AsyncTask {
 
-  private String term;
   private String itemId;
   private TextView viewToUpdate;
   private ProgressBar progressBar;
+  private int index;
+  private Context context;
 
-  public RetrieveRankAsyncTask(TextView viewToUpdate, ProgressBar progressBar, String term, String itemId){
+  public RetrieveRankAsyncTask(TextView viewToUpdate, ProgressBar progressBar, String itemId, int index){
     this.viewToUpdate = viewToUpdate;
     this.progressBar = progressBar;
-    this.term = term;
     this.itemId = itemId;
+    this.index = index;
+    this.context = progressBar.getContext();
   }
 
   @Override
@@ -36,7 +43,7 @@ public class RetrieveRankAsyncTask extends AsyncTask {
 
   @Override
   protected Object doInBackground(Object[] params) {
-    return EtsyApi.getListingRank(itemId, term);
+    return EtsyApi.getListingRank(context, itemId, index);
   }
 
   @Override
@@ -47,5 +54,8 @@ public class RetrieveRankAsyncTask extends AsyncTask {
     } else {
       viewToUpdate.setText(o.toString());
     }
+
+    String preferenceId = PreferenceNameHelper.getSearchTermLastRefreshed(itemId, index);
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(preferenceId, EtsyUtils.getPreferenceDateFormat().format(Calendar.getInstance().getTime())).commit();
   }
 }

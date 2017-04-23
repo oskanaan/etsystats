@@ -146,6 +146,9 @@ public class EtsyUtils {
       } else {
         prevRank = Integer.parseInt(prevRankPref);
       }
+    } else {
+      //No previous rank so do not show any image.
+      return 0;
     }
     if(currentRank < prevRank){
       return 1;

@@ -21,4 +21,5 @@ public interface Constants {
   String REFRESH_PERIOD_PREFIX = "RefreshPeriod";
   String SEARCH_TERM_LAST_REFRESHED_PREFIX = "LastRefreshed";
 
+  String FROM_NOTIFICATION = "FromNotification";
 }

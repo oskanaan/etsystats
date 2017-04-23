@@ -1,8 +1,13 @@
 package com.meccaartwork.etsystats.util;
 
+import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +32,22 @@ public class EtsyApi {
   public static JSONArray getShopCategories(int shopId){
     String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key="+Constants.API_KEY+"&includes=Images:1";
     return EtsyUtils.getResultsFromUrl(url);
+  }
+
+  public static JSONArray getShopListingsWithRankChanges(Context context, int shopId) throws JSONException {
+    String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key="+ Constants.API_KEY+"&includes=Images:1";
+    JSONArray jsonArray = EtsyUtils.getResultsFromUrl(url);
+    JSONArray filtered = new JSONArray();
+    for(int i=jsonArray.length()-1 ; i>=0 ; i--){
+      for(int j=1 ; j< Constants.MAX_SEARCH_TERMS; j++){
+        if(EtsyUtils.compareRankToPrevious(context, ((JSONObject)jsonArray.get(i)).getString("listing_id"), j) != 0){
+          filtered.put(jsonArray.get(i));
+          break;
+        }
+      }
+    }
+
+    return filtered;
   }
 
   public static JSONArray getCategoryListings(int shopId, int categoryId){
@@ -54,13 +75,18 @@ public class EtsyApi {
     return sections;
   }
 
-  public static int getListingRank(String listingId, String term){
+  public static int getListingRank(Context context, String listingId, int index){
     int selection = -1;
     try {
 
       boolean exit = false;
       int offset = 1;
 
+      String term = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferenceNameHelper.getSearchTermName(listingId, index), null);
+      //Do nothing for empty terms.
+      if(term == null){
+        return selection;
+      }
       while (!exit) {
         String url = "https://openapi.etsy.com/v2/listings/active?api_key="+ Constants.API_KEY+"&keywords=" + Uri.encode(term) + "&sort_on=score&limit=200&offset=" + offset;
         JSONArray listings = EtsyUtils.getResultsFromUrl(url);

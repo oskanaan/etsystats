@@ -35,7 +35,7 @@ public class ImageLoader {
 
     //Find the dir to save cached images
     if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
-      cacheDir=new File(context.getExternalCacheDir().getAbsoluteFile()+"EtsyStats");
+      cacheDir=new File(context.getExternalCacheDir().getAbsoluteFile()+"/EtsyStats");
     else
       cacheDir=context.getCacheDir();
     if(!cacheDir.exists())

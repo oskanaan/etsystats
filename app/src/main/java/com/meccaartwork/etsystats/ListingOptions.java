@@ -134,7 +134,7 @@ public class ListingOptions extends AppCompatActivity {
           final TextView searchTermRank = (TextView)parentViews.get(i).findViewById(R.id.searchTermRank);
           final ProgressBar progressBar = (ProgressBar)parentViews.get(i).findViewById(R.id.progress);
           if(searchTerm.getText().length() > 0){
-            new RetrieveRankAsyncTask(searchTermRank, progressBar, searchTerm.getText().toString(), listingId).execute();
+            new RetrieveRankAsyncTask(searchTermRank, progressBar, listingId, i+1).execute();
           }
         }
       }
