@@ -1,9 +1,11 @@
 package com.meccaartwork.etsystats;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +41,7 @@ public class ShopCategories extends Fragment {
           try {
             bundle.putInt(Constants.SECTION_ID, obj.getInt("shop_section_id"));
           } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
           }
 
           Intent startCategoryListings = new Intent();
@@ -50,19 +52,28 @@ public class ShopCategories extends Fragment {
       }
     });
 
-    new AsyncLoadData().execute(root);
+    new AsyncLoadData(getContext(), root).execute();
     return root;
   }
 
   private class AsyncLoadData extends AsyncTask {
 
     private View view;
+    private Context context;
+
+    public AsyncLoadData(Context context, View view){
+      this.context = context;
+      this.view = view;
+    }
 
     @Override
     protected Object doInBackground(Object[] params) {
-      this.view = (View) params[0];
       int shopId = EtsyUtils.getShopId(getContext());
-      return EtsyApi.getShopCategories(shopId);
+      if(shopId == -1){
+        return null;
+      } else {
+        return EtsyApi.getInstance().getShopCategories(context, shopId);
+      }
     }
 
     @Override

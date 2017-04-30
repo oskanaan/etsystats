@@ -1,22 +1,26 @@
 package com.meccaartwork.etsystats;
 
-import android.content.Context;
-import android.content.Intent;
+import android.annotation.TargetApi;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.Log;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.jobs.RefreshListingRank;
+
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends ActionBarActivity implements android.support.v7.app.ActionBar.TabListener {
 
@@ -53,6 +57,7 @@ public class Main extends ActionBarActivity implements android.support.v7.app.Ac
     // Specify that we will be displaying tabs in the action bar.
     actionBar.setNavigationMode(android.app.ActionBar.NAVIGATION_MODE_TABS);
 
+    setPageTitle();
     // Set up the ViewPager, attaching the adapter and setting up a listener for when the
     // user swipes between sections.
     mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -83,6 +88,38 @@ public class Main extends ActionBarActivity implements android.support.v7.app.Ac
       mViewPager.setCurrentItem(3, true);
 
     }
+
+    startRefreshRankScheduledJob();
+  }
+
+  private void setPageTitle() {
+    String shopTite = PreferenceManager.getDefaultSharedPreferences(this).getString("shop_title", null);
+    if(shopTite == null){
+      setTitle(R.string.app_name);
+    } else {
+      setTitle(getString(R.string.app_name)+" - "+shopTite);
+    }
+  }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  private void startRefreshRankScheduledJob() {
+    JobScheduler jobScheduler = (JobScheduler)getApplicationContext().getSystemService(JOB_SCHEDULER_SERVICE);
+    for(JobInfo pendingJob : jobScheduler.getAllPendingJobs()){
+      if(pendingJob.getService().getClassName().equals(RefreshListingRank.class.getName())){
+        Log.d(this.getClass().getName(), "Refresh rank job is already scheduled");
+        return;
+      }
+    }
+
+    Log.d(this.getClass().getName(),"Starting rank refresh scheduled job on app startup");
+    ComponentName jobService = new ComponentName(getApplicationContext(), RefreshListingRank.class);
+
+    JobInfo jobInfo = new JobInfo.Builder((int) Calendar.getInstance().getTimeInMillis(), jobService)
+        .setPeriodic(TimeUnit.HOURS.toMillis(Constants.BACKGROUND_JOB_RUN_HOURS))
+        .build();
+
+    int jobId = jobScheduler.schedule(jobInfo);
+    Log.d(this.getClass().getName(),"Scheduled RefreshListingRank to run now "+jobId);
   }
 
   @Override

@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
+<android.support.design.widget.CoordinatorLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/list"
-  android:name="com.meccaartwork.etsystats.RankChangeFragment"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:layout_marginLeft="16dp"
-  android:layout_marginRight="16dp"
-  app:layoutManager="LinearLayoutManager"
-  tools:context="com.meccaartwork.etsystats.RankChangeFragment"
-  tools:listitem="@layout/fragment_rankchange"/>
+  android:fitsSystemWindows="true"
+  tools:context="com.meccaartwork.etsystats.CategoryListings"
+  android:id="@+id/rankChangeLayout">
+
+  <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loadingPanel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    android:gravity="center" >
+
+    <ProgressBar
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:indeterminate="true" />
+  </RelativeLayout>
+  <android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/list"
+      android:name="com.meccaartwork.etsystats.RankChangeFragment"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      app:layoutManager="LinearLayoutManager"
+      tools:context="com.meccaartwork.etsystats.RankChangeFragment"
+      tools:listitem="@layout/fragment_rankchange"/>
+  </android.support.v4.widget.SwipeRefreshLayout>
+</android.support.design.widget.CoordinatorLayout>

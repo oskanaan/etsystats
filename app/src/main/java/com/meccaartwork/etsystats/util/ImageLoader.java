@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.meccaartwork.etsystats.R;
@@ -28,8 +30,16 @@ public class ImageLoader {
   private HashMap<String, Bitmap> cache=new HashMap<String, Bitmap>();
 
   private File cacheDir;
+  private int requiredImageSize;
+
+  final static int DEFAULT_IMAGE_SIZE = 70;
 
   public ImageLoader(Context context){
+   this(context, DEFAULT_IMAGE_SIZE);
+  }
+
+  public ImageLoader(Context context, int requiredImageSize){
+    this.requiredImageSize = requiredImageSize;
     //Make the background thead low priority. This way it will not affect the UI performance
     photoLoaderThread.setPriority(Thread.NORM_PRIORITY-1);
 
@@ -54,12 +64,28 @@ public class ImageLoader {
       imageView.setImageBitmap(cache.get(url));
     else
     {
-      queuePhoto(url, activity, imageView);
+      queuePhoto(url, imageView);
       imageView.setImageResource(R.drawable.stub);
     }
   }
 
-  private void queuePhoto(String url, Activity activity, ImageView imageView)
+  public Drawable getDrawable(String url)
+  {
+
+    if(url==null){
+      return null;
+    }
+
+    if(cache.containsKey(url))
+      return new BitmapDrawable(cache.get(url));
+    else
+    {
+      //Dont queue
+      return new BitmapDrawable(getBitmap(url));
+    }
+  }
+
+  private void queuePhoto(String url, ImageView imageView)
   {
     //This ImageView may be used for other images before. So there may be some old tasks in the queue. We need to discard them.
     photosQueue.Clean(imageView);
@@ -74,7 +100,7 @@ public class ImageLoader {
       photoLoaderThread.start();
   }
 
-  private Bitmap getBitmap(String url)
+  public Bitmap getBitmap(String url)
   {
     //I identify images by hashcode. Not a perfect solution, good for the demo.
     String filename=String.valueOf(url.hashCode());
@@ -95,7 +121,7 @@ public class ImageLoader {
       bitmap = decodeFile(f);
       return bitmap;
     } catch (Exception ex){
-      ex.printStackTrace();
+      Log.e(this.getClass().getName(), "error : "+ex.getMessage(), ex);
       return null;
     }
   }
@@ -109,11 +135,10 @@ public class ImageLoader {
       BitmapFactory.decodeStream(new FileInputStream(f),null,o);
 
       //Find the correct scale value. It should be the power of 2.
-      final int REQUIRED_SIZE=70;
       int width_tmp=o.outWidth, height_tmp=o.outHeight;
       int scale=1;
       while(true){
-        if(width_tmp/2<REQUIRED_SIZE || height_tmp/2<REQUIRED_SIZE)
+        if(width_tmp/2<requiredImageSize || height_tmp/2<requiredImageSize)
           break;
         width_tmp/=2;
         height_tmp/=2;

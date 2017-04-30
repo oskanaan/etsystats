@@ -3,28 +3,14 @@ package com.meccaartwork.etsystats;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,15 +19,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.meccaartwork.etsystats.async.DrawableFromUrlAsyncTask;
 import com.meccaartwork.etsystats.async.RetrieveRankAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
-import com.meccaartwork.etsystats.listener.PreferenceTextChangeListener;
+import com.meccaartwork.etsystats.listener.RankTermTextChangeListener;
 import com.meccaartwork.etsystats.listener.RankPreferenceTextChangeListener;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 import com.meccaartwork.etsystats.util.ImageHelper;
@@ -49,7 +35,6 @@ import com.meccaartwork.etsystats.util.ImageHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class ListingOptions extends AppCompatActivity {
 
@@ -73,29 +58,7 @@ public class ListingOptions extends AppCompatActivity {
     String listingTitleText = bundle.getString(Constants.LISTING_TITLE);
     listingTitle.setText(listingTitleText.substring(0,Math.min(100, listingTitleText.length()))+(listingTitleText.length()>=100?"...":""));
 
-    new AsyncTask(){
-
-      private BitmapDrawable drawable;
-      @Override
-      protected Object doInBackground(Object[] objects) {
-        try {
-          drawable = (BitmapDrawable) EtsyUtils.drawableFromUrl(ListingOptions.this.getApplicationContext().getResources(), imageUrl);
-        } catch (IOException e) {
-          e.printStackTrace();
-          Log.e(this.getClass().getName(), "Couldnt load listing image for listing ID "+listingId);
-        }
-        return null;
-      }
-
-      @Override
-      protected void onPostExecute(Object o) {
-        Bitmap bitmap = drawable.getBitmap().copy(Bitmap.Config.ARGB_8888, true );
-
-        bitmap = ImageHelper.getRoundedCornerBitmap(bitmap, 20);
-        ImageHelper.scaleImage(listingImage, bitmap);
-
-      }
-    }.execute();
+    new DrawableFromUrlAsyncTask(getApplicationContext(), listingId, listingImage, imageUrl).execute();
 
     final List<View> parentViews = new ArrayList<>();
     LinearLayoutCompat layout = (LinearLayoutCompat)findViewById(R.id.rankDisplay);
@@ -106,24 +69,29 @@ public class ListingOptions extends AppCompatActivity {
       parentViews.add(rankItemsParent);
       layout.addView(rankItemsParent, i-1 );
       final EditText searchTerm = (EditText) rankItemsParent.findViewById(R.id.searchTerm);
+      searchTerm.setTag("searchTermTag"+i);
       final TextView searchTermRank = (TextView) rankItemsParent.findViewById(R.id.searchTermRank);
-      final ImageView inceaseImage = (ImageView) rankItemsParent.findViewById(R.id.increase);
+      searchTermRank.setTag("searchTermRank"+i);
+      final ImageView increaseImage = (ImageView) rankItemsParent.findViewById(R.id.increase);
+      increaseImage.setTag("increaseImage"+i);
       final ImageView decreaseImage = (ImageView) rankItemsParent.findViewById(R.id.decrease);
+      decreaseImage.setTag("decreaseImage"+i);
+
       int rankChange = EtsyUtils.compareRankToPrevious(getApplicationContext(),listingId, i);
       if(rankChange == -1){
-        inceaseImage.setVisibility(View.GONE);
+        increaseImage.setVisibility(View.GONE);
         decreaseImage.setVisibility(View.VISIBLE);
       } else if(rankChange == 1){
-        inceaseImage.setVisibility(View.VISIBLE);
+        increaseImage.setVisibility(View.VISIBLE);
         decreaseImage.setVisibility(View.GONE);
       } else {
-        inceaseImage.setVisibility(View.GONE);
+        increaseImage.setVisibility(View.GONE);
         decreaseImage.setVisibility(View.GONE);
       }
       searchTerm.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(PreferenceNameHelper.getSearchTermName(listingId, i), ""));
       searchTermRank.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(PreferenceNameHelper.getSearchTermRankName(listingId, i) , ""));
-      searchTerm.addTextChangedListener(new PreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermName(listingId, i)));
-      searchTermRank.addTextChangedListener(new RankPreferenceTextChangeListener(getApplicationContext(), PreferenceNameHelper.getSearchTermRankName(listingId, i), PreferenceNameHelper.getPreviousSearchTermRankName(listingId, i), inceaseImage, decreaseImage, listingId, i));
+      searchTerm.addTextChangedListener(new RankTermTextChangeListener(getApplicationContext(), searchTermRank, listingId, i));
+      searchTermRank.addTextChangedListener(new RankPreferenceTextChangeListener(getApplicationContext(), increaseImage, decreaseImage, listingId, i));
     }
 
     findViewById(R.id.refreshResult).setOnClickListener(new View.OnClickListener() {
@@ -153,11 +121,11 @@ public class ListingOptions extends AppCompatActivity {
       @Override
       public void onNothingSelected(AdapterView<?> parent) {
         PreferenceManager.getDefaultSharedPreferences(spinner.getContext())
-            .edit().putInt(preferenceId, 4).commit();
+            .edit().putInt(preferenceId, 3).commit();
       }
     });
 
-    int selectedRefreshPeriod = PreferenceManager.getDefaultSharedPreferences(spinner.getContext()).getInt(preferenceId, 4);
+    int selectedRefreshPeriod = PreferenceManager.getDefaultSharedPreferences(spinner.getContext()).getInt(preferenceId, 3);
     spinner.setSelection(selectedRefreshPeriod);
 
 
@@ -167,9 +135,17 @@ public class ListingOptions extends AppCompatActivity {
     favourite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        PreferenceManager.getDefaultSharedPreferences(ListingOptions.this).edit().putBoolean(PreferenceNameHelper.getFavouriteName(listingId), isChecked).commit();
+        PreferenceManager.getDefaultSharedPreferences(ListingOptions.this)
+            .edit()
+            .putBoolean(PreferenceNameHelper.getFavouriteName(listingId), isChecked)
+            .commit();
+        PreferenceManager.getDefaultSharedPreferences(ListingOptions.this)
+            .edit()
+            .putBoolean(PreferenceNameHelper.getFavouriteChangeIndicatorName(), true)
+            .commit();
       }
     });
+
 
     
   }

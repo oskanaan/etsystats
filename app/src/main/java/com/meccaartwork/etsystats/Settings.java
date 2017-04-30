@@ -47,7 +47,7 @@ public class Settings extends Fragment {
     shopName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
       @Override
       public boolean onEditorAction(final TextView v, int actionId, KeyEvent event) {
-        if(actionId == EditorInfo.IME_ACTION_DONE){
+        if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT){
           new GetShopDetailsAsyncTask(getContext(), shopName, shopTitleView, imageView).execute();
         }
         return true;

@@ -1,7 +1,6 @@
 package com.meccaartwork.etsystats.jobs;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
@@ -9,13 +8,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import com.meccaartwork.etsystats.data.Constants;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 /**
@@ -23,7 +22,7 @@ import static android.content.Context.JOB_SCHEDULER_SERVICE;
  */
 
 public class BootBroadcastReceiver extends BroadcastReceiver {
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
   public void onReceive(Context context, Intent intent) {
     if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
@@ -31,7 +30,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
       ComponentName jobService = new ComponentName(context, RefreshListingRank.class);
 
       JobInfo jobInfo = new JobInfo.Builder((int) Calendar.getInstance().getTimeInMillis(), jobService)
-          .setPeriodic(TimeUnit.SECONDS.toMillis(5))
+          .setPeriodic(TimeUnit.HOURS.toMillis(Constants.BACKGROUND_JOB_RUN_HOURS))
           .build();
       JobScheduler jobScheduler = (JobScheduler)context.getSystemService(JOB_SCHEDULER_SERVICE);
 

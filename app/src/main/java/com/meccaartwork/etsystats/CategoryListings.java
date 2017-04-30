@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -17,6 +17,7 @@ import android.widget.ListView;
 import com.meccaartwork.etsystats.adapter.ListingAdapter;
 import com.meccaartwork.etsystats.async.LoadCategoryListingsAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.util.EtsyUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,7 +54,7 @@ public class CategoryListings extends AppCompatActivity {
     try {
       ((ListingAdapter)((ListView)findViewById(R.id.categoryListings)).getAdapter()).filterData(text);
     } catch (JSONException e) {
-      e.printStackTrace();
+      Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
       return false;
     }
 
@@ -61,7 +62,6 @@ public class CategoryListings extends AppCompatActivity {
   }
 
 
-  @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -88,7 +88,7 @@ public class CategoryListings extends AppCompatActivity {
             bundle.putString(Constants.LISTING_TITLE, obj.getString("title"));
             bundle.putString(Constants.LISTING_IMAGE_URL, ((JSONObject) ((JSONArray)obj.get("Images")).get(0)).getString("url_570xN"));
           } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
           }
 
           Intent startListingOptions = new Intent();

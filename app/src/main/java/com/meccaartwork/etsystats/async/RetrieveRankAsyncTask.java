@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.meccaartwork.etsystats.R;
+import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
@@ -43,14 +44,14 @@ public class RetrieveRankAsyncTask extends AsyncTask {
 
   @Override
   protected Object doInBackground(Object[] params) {
-    return EtsyApi.getListingRank(context, itemId, index);
+    return EtsyApi.getInstance().getListingRank(context, itemId, index);
   }
 
   @Override
   protected void onPostExecute(Object o) {
     progressBar.setVisibility(View.GONE);
     if(o.equals(-1)){
-      viewToUpdate.setText(R.string.err_greater_than_200);
+      viewToUpdate.setText(context.getString(R.string.err_greater_than_max, Constants.MAX_RESULTS_CHECK));
     } else {
       viewToUpdate.setText(o.toString());
     }

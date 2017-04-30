@@ -2,9 +2,8 @@ package com.meccaartwork.etsystats.util;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
@@ -18,43 +17,70 @@ import org.json.JSONObject;
  */
 
 public class EtsyApi {
-  public static JSONArray getShopData(String shopName){
+
+  String TAG = this.getClass().getSimpleName();
+  static EtsyApi instance;
+
+  public static EtsyApi getInstance(){
+    if(instance == null){
+      instance = new EtsyApi();
+    }
+    return instance;
+  }
+
+  public static void setInstance(EtsyApi pInstance){
+    instance = pInstance;
+  }
+
+  public JSONArray getShopData(Context context, String shopName){
     String url = "https://openapi.etsy.com/v2/shops?api_key="+ Constants.API_KEY+"&shop_name="+shopName;
 
-    return EtsyUtils.getResultsFromUrl(url);
+    return EtsyUtils.getAllResultsFromUrl(context, url);
   }
 
-  public static JSONObject getShopCategoriesObject(int shopId){
+  public JSONObject getShopCategoriesObject(Context context, int shopId){
     String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key="+Constants.API_KEY+"&includes=Images:1";
-    return EtsyUtils.getDataFromUrl(url);
+    return EtsyUtils.getDataFromUrl(context, url);
   }
 
-  public static JSONArray getShopCategories(int shopId){
+  public JSONArray getShopCategories(Context context, int shopId){
     String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key="+Constants.API_KEY+"&includes=Images:1";
-    return EtsyUtils.getResultsFromUrl(url);
+    return EtsyUtils.getResultsFromUrl(context, url);
   }
 
-  public static JSONArray getShopListingsWithRankChanges(Context context, int shopId) throws JSONException {
+  public JSONArray getAllShopListings(Context context, int shopId){
+    Log.d(TAG, "Getting ALL shop listings");
     String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key="+ Constants.API_KEY+"&includes=Images:1";
-    JSONArray jsonArray = EtsyUtils.getResultsFromUrl(url);
+    return EtsyUtils.getAllResultsFromUrl(context, url);
+  }
+
+  public JSONArray getShopListingsWithRankChanges(Context context, int shopId) throws JSONException {
+    Log.d(TAG, "Getting shop listings with rank changes");
+    JSONArray jsonArray = getInstance().getAllShopListings(context, shopId);
     JSONArray filtered = new JSONArray();
+
+    Log.d(TAG, "Filtering results to get only ones with rank changes");
+
     for(int i=jsonArray.length()-1 ; i>=0 ; i--){
       for(int j=1 ; j< Constants.MAX_SEARCH_TERMS; j++){
+        Log.d(TAG, "Processing listing with id "+((JSONObject)jsonArray.get(i)).getString("listing_id"));
         if(EtsyUtils.compareRankToPrevious(context, ((JSONObject)jsonArray.get(i)).getString("listing_id"), j) != 0){
+          Log.d(TAG, "Listing with id "+((JSONObject)jsonArray.get(i)).getString("listing_id")+" has rank changes, adding it to filtered list.");
           filtered.put(jsonArray.get(i));
           break;
         }
       }
     }
 
+    Log.d(TAG, "Filtered list is: "+filtered);
     return filtered;
   }
 
-  public static JSONArray getCategoryListings(int shopId, int categoryId){
+  public JSONArray getCategoryListings(Context context, int shopId, int categoryId){
     JSONArray sections;
     if(categoryId == Constants.NO_CATEGORY){
       String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/listings/active?api_key="+Constants.API_KEY+"&includes=Images:1";
-      JSONArray allListings = EtsyUtils.getResultsFromUrl(url);
+      JSONArray allListings = EtsyUtils.getAllResultsFromUrl(context, url);
       sections = new JSONArray();
       for(int i=0 ; i < allListings.length() ; i++){
         JSONObject jsonObject = null;
@@ -64,18 +90,18 @@ public class EtsyApi {
             sections.put(jsonObject);
           }
         } catch (JSONException e) {
-          e.printStackTrace();
+          Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
         }
       }
     } else {
       String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections/"+categoryId+"/listings/active?api_key="+Constants.API_KEY+"&includes=Images:1";
-      sections = EtsyUtils.getResultsFromUrl(url);
+      sections = EtsyUtils.getAllResultsFromUrl(context, url);
     }
 
     return sections;
   }
 
-  public static int getListingRank(Context context, String listingId, int index){
+  public int getListingRank(Context context, String listingId, int index){
     int selection = -1;
     try {
 
@@ -88,8 +114,8 @@ public class EtsyApi {
         return selection;
       }
       while (!exit) {
-        String url = "https://openapi.etsy.com/v2/listings/active?api_key="+ Constants.API_KEY+"&keywords=" + Uri.encode(term) + "&sort_on=score&limit=200&offset=" + offset;
-        JSONArray listings = EtsyUtils.getResultsFromUrl(url);
+        String url = "https://openapi.etsy.com/v2/listings/active?api_key="+ Constants.API_KEY+"&keywords=" + Uri.encode(term) + "&sort_on=score&region=NZ&limit=100&offset=" + offset;
+        JSONArray listings = EtsyUtils.getResultsFromUrl(context, url);
 
         if(listings == null || listings.length() == 0){
           break;
@@ -100,15 +126,21 @@ public class EtsyApi {
 
           if (listing.get("listing_id").equals(Integer.parseInt(listingId))) {
             exit = true;
-            selection = i+1;
+            selection = offset + i;
             break;
           }
         }
 
         offset += listings.length();
-        if (exit || offset > 100 || listings.length() == 0) {
+        if (exit){
           break;
         }
+
+        if(offset > Constants.MAX_RESULTS_CHECK || listings.length() == 0){
+          selection = -1;
+          break;
+        }
+
       }
 
     } catch (JSONException e) {

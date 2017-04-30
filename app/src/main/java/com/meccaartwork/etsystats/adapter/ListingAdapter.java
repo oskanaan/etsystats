@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +96,7 @@ public class ListingAdapter extends SimpleAdapter {
         holder.image.requestLayout();
       }
     } catch (JSONException e) {
-      e.printStackTrace();
+      Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
     }
 
 
@@ -112,7 +113,7 @@ public class ListingAdapter extends SimpleAdapter {
     try {
       return data.get(position);
     } catch (JSONException e) {
-      e.printStackTrace();
+      Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
     }
     return null;
   }

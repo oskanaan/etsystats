@@ -18,10 +18,12 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.Toast;
 
+import com.meccaartwork.etsystats.async.GetShopIdFromNameAsyncTask;
 import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
@@ -177,9 +179,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
           try {
             return storeShopIdFromName(getActivity(), newValue.toString());
           } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().getName(), "IO error - Couldnt not retrieve values from server: "+e.getMessage());
           } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
           }
           return false;
         }
@@ -229,40 +231,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
   }
 
   public static boolean storeShopIdFromName(final Context context, final String name) throws IOException, JSONException {
-    new AsyncTask(){
-
-      private int shopId;
-      @Override
-      protected Object doInBackground(Object[] params) {
-        return EtsyApi.getShopData(name);
-      }
-
-      @Override
-      protected void onPostExecute(Object o) {
-        JSONArray listings = (JSONArray)o;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (listings.length() > 1){
-          Toast.makeText(context, R.string.error_multiple_shops_with_similar_name, Toast.LENGTH_LONG).show();
-          prefs.edit().putString("shop_name", null).commit();
-          prefs.edit().putInt("shop_id", -1).commit();
-
-        }
-        else if(listings.length() == 0){
-          Toast.makeText(context, R.string.error_no_shop_with_similar_name,Toast.LENGTH_LONG).show();
-          prefs.edit().putString("shop_name", null).commit();
-          prefs.edit().putInt("shop_id", -1).commit();
-        }
-        else{
-          try {
-            prefs.edit().putInt("shop_id", ((JSONObject) listings.get(0)).getInt("shop_id")).commit();
-            shopId = ((JSONObject) listings.get(0)).getInt("shop_id");
-            Toast.makeText(context, R.string.shop_found_and_id_saved, Toast.LENGTH_LONG).show();
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-        }
-      }
-    }.execute();
+    new GetShopIdFromNameAsyncTask(context, name).execute();
 
 
     return true;

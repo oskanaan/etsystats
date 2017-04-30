@@ -2,15 +2,17 @@ package com.meccaartwork.etsystats;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.meccaartwork.etsystats.RankChangeFragment.OnListFragmentInteractionListener;
 import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyUtils;
@@ -20,14 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
-/**
- * {@link RecyclerView.Adapter} that can display a {@link JSONObject} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
-public class RankChangeRecyclerViewAdapter extends RecyclerView.Adapter<RankChangeRecyclerViewAdapter.ViewHolder> {
+  public class RankChangeRecyclerViewAdapter extends RecyclerView.Adapter<RankChangeRecyclerViewAdapter.ViewHolder> {
 
   private final JSONArray mValues;
   private final Context context;
@@ -46,7 +41,6 @@ public class RankChangeRecyclerViewAdapter extends RecyclerView.Adapter<RankChan
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     for(int i = 1; i< Constants.MAX_SEARCH_TERMS; i++){
-      View ranksView = view.findViewById(R.id.ranks);
       View rankDisplay = inflater.inflate(R.layout.fragment_rankchange_rankdisplay, (ViewGroup) view);
       rankDisplay.setTag("Index"+i);
     }
@@ -86,7 +80,24 @@ public class RankChangeRecyclerViewAdapter extends RecyclerView.Adapter<RankChan
         }
       }
 
+      holder.mView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Bundle bundle = new Bundle();
+          try {
+            bundle.putString(Constants.LISTING_ID, holder.mItem.getString("listing_id"));
+            bundle.putString(Constants.LISTING_TITLE, holder.mItem.getString("title"));
+            bundle.putString(Constants.LISTING_IMAGE_URL, ((JSONObject) ((JSONArray)holder.mItem.get("Images")).get(0)).getString("url_570xN"));
+          } catch (JSONException e) {
+            Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
+          }
 
+          Intent startListingOptions = new Intent();
+          startListingOptions.putExtras(bundle);
+          startListingOptions.setClassName("com.meccaartwork.etsystats", "com.meccaartwork.etsystats.ListingOptions");
+          context.startActivity(startListingOptions);
+        }
+      });
 //      holder.mContentView.setText(mValues.get(position).content);
 
 //      holder.mView.setOnClickListener(new View.OnClickListener() {

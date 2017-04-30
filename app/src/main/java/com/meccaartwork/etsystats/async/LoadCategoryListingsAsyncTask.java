@@ -16,12 +16,13 @@ import org.json.JSONArray;
  * Created by oskanaan on 22/04/17.
  */
 
-public class LoadCategoryListingsAsyncTask extends AsyncTask {
+public class LoadCategoryListingsAsyncTask extends NetworkEnabledAsyncTask {
   private View loadingPanel ;
   private Activity activity;
   private int categoryId;
 
   public LoadCategoryListingsAsyncTask(Activity activity, View loadingPanel, int categoryId){
+    super(activity);
     this.loadingPanel = loadingPanel;
     this.activity = activity;
     this.categoryId = categoryId;
@@ -36,7 +37,7 @@ public class LoadCategoryListingsAsyncTask extends AsyncTask {
   @Override
   protected Object doInBackground(Object[] params) {
     int shopId = EtsyUtils.getShopId(activity);
-    return EtsyApi.getCategoryListings(shopId, categoryId);
+    return EtsyApi.getInstance().getCategoryListings(activity, shopId, categoryId);
   }
 
   @Override

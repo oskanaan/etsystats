@@ -14,37 +14,44 @@ import com.meccaartwork.etsystats.util.EtsyUtils;
  * Created by oskanaan on 13/04/17.
  */
 
-public class RankPreferenceTextChangeListener extends PreferenceTextChangeListener {
+public class RankPreferenceTextChangeListener implements TextWatcher {
 
-  private String prevPreferenceId;
   private ImageView increase;
   private ImageView decrease;
   private int index;
   private String listingId;
+  private Context context;
 
-  public RankPreferenceTextChangeListener(Context context, String preferenceId, String prevPreferenceId, ImageView increase, ImageView decrease, String listingId, int index) {
-    super(context, preferenceId);
-    this.prevPreferenceId = prevPreferenceId;
+  public RankPreferenceTextChangeListener(Context context, ImageView increase, ImageView decrease, String listingId, int index) {
     this.increase = increase;
     this.decrease = decrease;
     this.index = index;
     this.listingId = listingId;
+    this.context = context;
   }
 
   @Override
   public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    super.beforeTextChanged(s, start, count, after);
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(prevPreferenceId, s.toString()).commit();
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PreferenceNameHelper.getPreviousSearchTermRankName(listingId, index), s.toString()).commit();
+  }
+
+  @Override
+  public void onTextChanged(CharSequence s, int start, int before, int count) {
+
   }
 
   @Override
   public void afterTextChanged(Editable s) {
-    super.afterTextChanged(s);
-    int rankChange = EtsyUtils.compareRankToPrevious(context,listingId, index);
+    String preferenceId = PreferenceNameHelper.getSearchTermRankName(listingId, index);
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(preferenceId, s.toString()).commit();
+
+    int rankChange = EtsyUtils.compareRankToPrevious(context, listingId, index);
     if(rankChange == -1){
+      PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getRankChangeIndicatorName(), true).commit();
       increase.setVisibility(View.GONE);
       decrease.setVisibility(View.VISIBLE);
     } else if(rankChange == 1){
+      PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getRankChangeIndicatorName(), true).commit();
       increase.setVisibility(View.VISIBLE);
       decrease.setVisibility(View.GONE);
     } else {

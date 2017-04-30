@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.meccaartwork.etsystats.R;
 import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
+import com.meccaartwork.etsystats.util.ImageLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +25,7 @@ import java.io.IOException;
  * Created by oskanaan on 22/04/17.
  */
 
-public class GetShopDetailsAsyncTask extends AsyncTask{
+public class GetShopDetailsAsyncTask extends NetworkEnabledAsyncTask{
   String shopNameText;
   private int shopId;
   private String shopName;
@@ -37,6 +39,7 @@ public class GetShopDetailsAsyncTask extends AsyncTask{
   private Context context;
 
   public GetShopDetailsAsyncTask(Context context, TextView shopNameView, TextView shopTitleView, ImageView shopIconView){
+    super(context);
     this.shopNameView = shopNameView;
     this.shopTitleView = shopTitleView;
     this.shopIconView = shopIconView;
@@ -51,7 +54,7 @@ public class GetShopDetailsAsyncTask extends AsyncTask{
 
   @Override
   protected Object doInBackground(Object[] params) {
-    JSONArray shops = EtsyApi.getShopData(shopNameText);
+    JSONArray shops = EtsyApi.getInstance().getShopData(context, shopNameText);
     if (shops.length() == 1){
       try {
         shopId = ((JSONObject) shops.get(0)).getInt("shop_id");
@@ -59,11 +62,9 @@ public class GetShopDetailsAsyncTask extends AsyncTask{
         shopTitle = ((JSONObject) shops.get(0)).getString("title");
         imageUrl = ((JSONObject) shops.get(0)).getString("icon_url_fullxfull");
 
-        drawable = EtsyUtils.drawableFromUrl(context.getResources(), imageUrl);
+        drawable = new ImageLoader(context).getDrawable(imageUrl);
       } catch (JSONException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
+        Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
       }
 
     }

@@ -32,4 +32,12 @@ public class PreferenceNameHelper {
     return Constants.FAVOURITE_PREFIX +"#"+ listingId;
   }
 
+  public static String getFavouriteChangeIndicatorName(){
+    return Constants.FAVOURITES_CHANGED ;
+  }
+
+  public static String getRankChangeIndicatorName(){
+    return Constants.RANK_CHANGED;
+  }
+
 }

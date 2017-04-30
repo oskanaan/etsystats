@@ -22,4 +22,8 @@ public interface Constants {
   String SEARCH_TERM_LAST_REFRESHED_PREFIX = "LastRefreshed";
 
   String FROM_NOTIFICATION = "FromNotification";
+  int MAX_RESULTS_CHECK = 1000;
+  int BACKGROUND_JOB_RUN_HOURS = 24;
+  String RANK_CHANGED = "RankChangedFlag";
+  String FAVOURITES_CHANGED = "FavouritesChanged";
 }
