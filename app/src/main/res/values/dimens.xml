@@ -7,4 +7,5 @@
   <dimen name="text_margin">16dp</dimen>
   <dimen name="label_text_size">16dp</dimen>
   <dimen name="list_text_size">17dp</dimen>
+  <dimen name="category_text_size">19dp</dimen>
 </resources>

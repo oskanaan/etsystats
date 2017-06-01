@@ -52,7 +52,7 @@ public class RefreshAllRanks extends AsyncTask {
       if(key.startsWith(Constants.REFRESH_PERIOD_PREFIX) && key.contains("#")){
         String listingId = key.split("#")[1];
         Log.d(this.getClass().getName(), "Refreshing ranks for listing ID: "+listingId);
-        for(int i=1; i<Constants.MAX_SEARCH_TERMS; i++){
+        for(int i=1; i<Constants.MAX_SEARCH_TERMS+1; i++){
           if(!isRefreshDue(listingId, i)){
             Log.d(this.getClass().getName(), "Refresh not due yet, continue with other search terms.");
             continue;

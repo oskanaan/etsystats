@@ -122,7 +122,7 @@ public class EtsyUtils {
   public static JSONArray getAllResultsFromUrl(Context context, String url){
     Log.d(TAG, "Retrieving results from server for all pages from url "+url);
     boolean exit = false;
-    int offset = 1;
+    int offset = 0;
     JSONArray result = new JSONArray();
     while(!exit){
       String paging = "&limit=100&offset=" + offset;
@@ -141,7 +141,7 @@ public class EtsyUtils {
       }
 
       offset += listings.length();
-      if (offset > Constants.MAX_RESULTS_CHECK){
+      if (offset > Constants.MAX_RESULTS_CHECK-1 || listings.length()<100){
         exit = true;
       }
     }

@@ -1,7 +1,6 @@
 package com.meccaartwork.etsystats.async;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ListView;
 

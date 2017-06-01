@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.meccaartwork.etsystats.adapter.ListingAdapter;
+import com.meccaartwork.etsystats.adapter.CategoryAdapter;
 import com.meccaartwork.etsystats.data.Constants;
 import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
@@ -23,7 +23,7 @@ import org.json.JSONObject;
 
 public class ShopCategories extends Fragment {
 
-  ListingAdapter adapter;
+  CategoryAdapter adapter;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,7 +89,7 @@ public class ShopCategories extends Fragment {
       } catch (JSONException e) {
         e.printStackTrace();
       }
-      adapter = new ListingAdapter(getContext(), returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
+      adapter = new CategoryAdapter(getContext(), returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
       ((ListView)view.findViewById(R.id.shopCategories)).setAdapter(adapter);
     }
   }

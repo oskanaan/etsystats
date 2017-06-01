@@ -44,7 +44,7 @@ public class EtsyApi {
   }
 
   public JSONArray getShopCategories(Context context, int shopId){
-    String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key="+Constants.API_KEY+"&includes=Images:1";
+    String url = "https://openapi.etsy.com/v2/shops/"+shopId+"/sections?api_key="+Constants.API_KEY;
     return EtsyUtils.getResultsFromUrl(context, url);
   }
 
@@ -62,7 +62,7 @@ public class EtsyApi {
     Log.d(TAG, "Filtering results to get only ones with rank changes");
 
     for(int i=jsonArray.length()-1 ; i>=0 ; i--){
-      for(int j=1 ; j< Constants.MAX_SEARCH_TERMS; j++){
+      for(int j=1 ; j< Constants.MAX_SEARCH_TERMS+1; j++){
         Log.d(TAG, "Processing listing with id "+((JSONObject)jsonArray.get(i)).getString("listing_id"));
         if(EtsyUtils.compareRankToPrevious(context, ((JSONObject)jsonArray.get(i)).getString("listing_id"), j) != 0){
           Log.d(TAG, "Listing with id "+((JSONObject)jsonArray.get(i)).getString("listing_id")+" has rank changes, adding it to filtered list.");
@@ -106,7 +106,7 @@ public class EtsyApi {
     try {
 
       boolean exit = false;
-      int offset = 1;
+      int offset = 0;
 
       String term = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferenceNameHelper.getSearchTermName(listingId, index), null);
       //Do nothing for empty terms.
@@ -118,6 +118,7 @@ public class EtsyApi {
         JSONArray listings = EtsyUtils.getResultsFromUrl(context, url);
 
         if(listings == null || listings.length() == 0){
+          selection = -1;
           break;
         }
 
@@ -136,7 +137,7 @@ public class EtsyApi {
           break;
         }
 
-        if(offset > Constants.MAX_RESULTS_CHECK || listings.length() == 0){
+        if(offset > Constants.MAX_RESULTS_CHECK-1 || listings.length() == 0){
           selection = -1;
           break;
         }

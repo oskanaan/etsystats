@@ -40,7 +40,7 @@ import org.json.JSONObject;
         .inflate(R.layout.fragment_rankchange, parent, false);
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    for(int i = 1; i< Constants.MAX_SEARCH_TERMS; i++){
+    for(int i = 1; i< Constants.MAX_SEARCH_TERMS+1; i++){
       View rankDisplay = inflater.inflate(R.layout.fragment_rankchange_rankdisplay, (ViewGroup) view);
       rankDisplay.setTag("Index"+i);
     }
@@ -63,7 +63,7 @@ import org.json.JSONObject;
       holder.listingImage.setTag(url);
       imageLoader.displayImage(url, ((Activity) context), holder.listingImage);
 
-      for(int i = 1; i< Constants.MAX_SEARCH_TERMS; i++){
+      for(int i = 1; i< Constants.MAX_SEARCH_TERMS+1; i++){
         int rankComparison = EtsyUtils.compareRankToPrevious(context, holder.listingId, i);
         if(rankComparison != 0){
           View rankDisplay = holder.mView.findViewWithTag("Index1");

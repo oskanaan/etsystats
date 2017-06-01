@@ -62,7 +62,7 @@ public class GetShopDetailsAsyncTask extends NetworkEnabledAsyncTask{
         shopTitle = ((JSONObject) shops.get(0)).getString("title");
         imageUrl = ((JSONObject) shops.get(0)).getString("icon_url_fullxfull");
 
-        drawable = new ImageLoader(context).getDrawable(imageUrl);
+        drawable = new ImageLoader(context, 350).getDrawable(imageUrl);
       } catch (JSONException e) {
         Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
       }
