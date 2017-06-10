@@ -81,9 +81,11 @@ public class CategoryAdapter extends SimpleAdapter {
     try {
       JSONObject jsonObject = ((JSONObject) data.get(position));
       String title = jsonObject.getString("title");
-      int activeCount = jsonObject.getInt("active_listing_count");
       holder.text.setText(title.substring(0, Math.min(title.length(), 50)) + (title.length() > 50 ? "..." : ""));
-      holder.count.setText(" ("+activeCount+")");
+      if(jsonObject.has("active_listing_count"))     {
+        int activeCount = jsonObject.getInt("active_listing_count");
+        holder.count.setText(" ("+activeCount+")");
+      }
     } catch (JSONException e) {
       Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
     }

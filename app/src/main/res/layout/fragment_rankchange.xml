@@ -7,7 +7,8 @@
   <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingTop="2dp">
     <ImageView android:layout_height="54dip"
                android:layout_width="100dip"
                android:id="@+id/listingImage"/>
@@ -25,5 +26,6 @@
 
     </LinearLayout>
   </LinearLayout>
-
+  <include layout="@layout/fragment_rankchange_all_rankdisplay" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <include layout="@layout/seperator"/>
 </LinearLayout>

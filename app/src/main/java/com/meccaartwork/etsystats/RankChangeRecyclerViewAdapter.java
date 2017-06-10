@@ -38,13 +38,10 @@ import org.json.JSONObject;
   public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View view = LayoutInflater.from(parent.getContext())
         .inflate(R.layout.fragment_rankchange, parent, false);
-    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    for(int i = 1; i< Constants.MAX_SEARCH_TERMS+1; i++){
-      View rankDisplay = inflater.inflate(R.layout.fragment_rankchange_rankdisplay, (ViewGroup) view);
-      rankDisplay.setTag("Index"+i);
+    for(int i = Constants.MAX_SEARCH_TERMS+1; i< Constants.MAX_SEARCH_TERM_ALLOWED+1; i++){
+      view.findViewWithTag("Index"+i).setVisibility(View.GONE);
     }
-    inflater.inflate(R.layout.seperator, (ViewGroup) view);
 
     return new ViewHolder(view);
   }
@@ -66,7 +63,7 @@ import org.json.JSONObject;
       for(int i = 1; i< Constants.MAX_SEARCH_TERMS+1; i++){
         int rankComparison = EtsyUtils.compareRankToPrevious(context, holder.listingId, i);
         if(rankComparison != 0){
-          View rankDisplay = holder.mView.findViewWithTag("Index1");
+          View rankDisplay = holder.mView.findViewWithTag("Index"+i);
           if(rankComparison > 0){
             rankDisplay.findViewById(R.id.increase).setVisibility(View.VISIBLE);
           } else {
@@ -77,6 +74,9 @@ import org.json.JSONObject;
           ((TextView)rankDisplay.findViewById(R.id.rankFromTo)).setText(context.getString(R.string.result_from_to, prevRank, currentRank));
           String term = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferenceNameHelper.getSearchTermName(holder.listingId, i), "N/A");
           ((TextView)rankDisplay.findViewById(R.id.searchTerm)).setText(term);
+        } else {
+          View rankDisplay = holder.mView.findViewWithTag("Index"+i);
+          rankDisplay.setVisibility(View.GONE);
         }
       }
 

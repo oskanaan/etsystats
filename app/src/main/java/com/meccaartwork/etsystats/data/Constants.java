@@ -13,6 +13,7 @@ public interface Constants {
 
   int NO_CATEGORY = -1;
   int MAX_SEARCH_TERMS = 2;
+  int MAX_SEARCH_TERM_ALLOWED = 5;
 
   //Settings prefixes
   String SEARCH_TERM_PREFIX = "SearchTerm";
