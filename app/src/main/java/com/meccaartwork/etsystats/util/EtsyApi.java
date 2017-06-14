@@ -62,10 +62,15 @@ public class EtsyApi {
     Log.d(TAG, "Filtering results to get only ones with rank changes");
 
     for(int i=jsonArray.length()-1 ; i>=0 ; i--){
+      String listingId = ((JSONObject)jsonArray.get(i)).getString("listing_id");
+      if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PreferenceNameHelper.getItemRankChangeDismissFlagName(listingId), false)){
+        //User has dimissed this item.
+        continue;
+      }
       for(int j=1 ; j< Constants.MAX_SEARCH_TERMS+1; j++){
-        Log.d(TAG, "Processing listing with id "+((JSONObject)jsonArray.get(i)).getString("listing_id"));
-        if(EtsyUtils.compareRankToPrevious(context, ((JSONObject)jsonArray.get(i)).getString("listing_id"), j) != 0){
-          Log.d(TAG, "Listing with id "+((JSONObject)jsonArray.get(i)).getString("listing_id")+" has rank changes, adding it to filtered list.");
+        Log.d(TAG, "Processing listing with id "+listingId);
+        if(EtsyUtils.compareRankToPrevious(context, listingId, j) != 0){
+          Log.d(TAG, "Listing with id "+listingId+" has rank changes, adding it to filtered list.");
           filtered.put(jsonArray.get(i));
           break;
         }

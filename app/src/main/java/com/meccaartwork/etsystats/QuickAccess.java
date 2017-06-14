@@ -80,38 +80,4 @@ public class QuickAccess extends Fragment {
     }
   }
 
-  //  @Override
-//  public boolean onCreateOptionsMenu(Menu menu) {
-//    MenuInflater inflater = getMenuInflater();
-//    inflater.inflate(R.menu.options_menu, menu);
-//
-//    // Associate searchable configuration with the SearchView
-//    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-//    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-//    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//      @Override
-//      public boolean onQueryTextSubmit(String query) {
-//        return reloadResults(query);
-//      }
-//
-//      @Override
-//      public boolean onQueryTextChange(String newText) {
-//        return reloadResults(newText);
-//      }
-//    });
-//    return true;
-//  }
-
-//  private boolean reloadResults(String text) {
-//    try {
-//      adapter.filterData(text);
-//    } catch (JSONException e) {
-//      e.printStackTrace();
-//      return false;
-//    }
-//
-//    return true;
-//  }
-
 }

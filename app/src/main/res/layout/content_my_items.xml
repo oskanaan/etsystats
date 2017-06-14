@@ -22,6 +22,13 @@
       android:indeterminate="true" />
   </RelativeLayout>
 
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" android:layout_marginTop="10dp"></LinearLayout>
   <android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/swiperefresh"
@@ -29,8 +36,10 @@
     android:layout_height="match_parent">
     <ListView android:id="@+id/quickAccess"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"></ListView>
+              android:layout_height="match_parent"
+      ></ListView>
   </android.support.v4.widget.SwipeRefreshLayout>
   <include layout="@layout/empty_list"/>
+  </LinearLayout>
 
 </RelativeLayout>

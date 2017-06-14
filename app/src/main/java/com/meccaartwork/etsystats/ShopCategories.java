@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.ListView;
 
 import com.meccaartwork.etsystats.adapter.CategoryAdapter;
 import com.meccaartwork.etsystats.data.Constants;
+import com.meccaartwork.etsystats.helper.PreferenceNameHelper;
 import com.meccaartwork.etsystats.util.EtsyApi;
 import com.meccaartwork.etsystats.util.EtsyUtils;
 
@@ -24,11 +27,13 @@ import org.json.JSONObject;
 public class ShopCategories extends Fragment {
 
   CategoryAdapter adapter;
+  private View loadingPanel;
+  private View root;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    View root = inflater.inflate(R.layout.content_shop_categories, container, false);
+    root = inflater.inflate(R.layout.content_shop_categories, container, false);
     ListView shopCategories = (ListView) root.findViewById(R.id.shopCategories);
     shopCategories.setEmptyView(inflater.inflate(R.layout.empty_list, container, false));
 
@@ -49,6 +54,15 @@ public class ShopCategories extends Fragment {
           startCategoryListings.setClassName("com.meccaartwork.etsystats", "com.meccaartwork.etsystats.CategoryListings");
           startActivity(startCategoryListings);
         }
+      }
+    });
+    final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swiperefresh);
+    loadingPanel = root.findViewById(R.id.loadingPanel);
+    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        refreshLayout.setRefreshing(false);
+        new AsyncLoadData(getContext(), root).execute();
       }
     });
 
@@ -77,20 +91,51 @@ public class ShopCategories extends Fragment {
     }
 
     @Override
+    protected void onPreExecute() {
+      loadingPanel.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     protected void onPostExecute(Object o) {
+      loadingPanel.setVisibility(View.GONE);
+
       if(o == null){
         return;
       }
 
       JSONArray returnedData = (JSONArray) o;
+      JSONArray filtered = new JSONArray();
+
+      for(int i=0 ; i<returnedData.length() ; i++){
+        try {
+          JSONObject jsonObject = (JSONObject) returnedData.get(i);
+          if(jsonObject.getInt("active_listing_count") > 0){
+            filtered.put(jsonObject);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      }
       //Add non categorized section
       try {
-        returnedData.put(new JSONObject("{shop_section_id:"+Constants.NO_CATEGORY+", title:\"No category\"}"));
+        filtered.put(new JSONObject("{shop_section_id:"+Constants.NO_CATEGORY+", title:\"No category\"}"));
       } catch (JSONException e) {
         e.printStackTrace();
       }
-      adapter = new CategoryAdapter(getContext(), returnedData, R.layout.etsy_listing, null, null, "shop_section_id");
+      adapter = new CategoryAdapter(getContext(), filtered, R.layout.etsy_listing, null, null, "shop_section_id");
       ((ListView)view.findViewById(R.id.shopCategories)).setAdapter(adapter);
+    }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(PreferenceNameHelper.getFavouriteChangeIndicatorName(), false)){
+      PreferenceManager.getDefaultSharedPreferences(getContext())
+          .edit()
+          .putBoolean(PreferenceNameHelper.getFavouriteChangeIndicatorName(), false)
+          .commit();
+      new AsyncLoadData(getContext(), root).execute();
     }
   }
 }

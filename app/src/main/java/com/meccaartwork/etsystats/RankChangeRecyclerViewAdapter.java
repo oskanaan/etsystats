@@ -1,8 +1,10 @@
 package com.meccaartwork.etsystats;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -114,6 +116,11 @@ import org.json.JSONObject;
       e.printStackTrace();
     }
 
+  }
+
+  @TargetApi(Build.VERSION_CODES.KITKAT)
+  public void removeItem(int index){
+    mValues.remove(index);
   }
 
   @Override

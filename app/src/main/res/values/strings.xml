@@ -29,7 +29,7 @@
   <string name="refresh_done">Etsy rank report is ready!</string>
   <string name="press_here_for_details">Press here for details.</string>
   <string name="show_push_notifications">Show rank changes in notification drawer (AKA push notifications)?</string>
-  <string name="rank_change">Rank Change summary</string>
+  <string name="rank_change">Rank Changes</string>
   <string name="result_from_to">%1$s to %2$s</string>
   <string name="no_internet_connect">No internet connection</string>
 

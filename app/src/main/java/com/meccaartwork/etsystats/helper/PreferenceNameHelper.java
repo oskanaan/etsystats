@@ -12,6 +12,10 @@ public class PreferenceNameHelper {
     return Constants.SEARCH_TERM_RANK_PREFIX +"#"+ listingId +"#"+index;
   }
 
+  public static String getItemRankChangeDismissFlagName(String listingId){
+    return Constants.RANK_CHANGE_DISMISS_FLAG +"#"+ listingId;
+  }
+
   public static String getSearchTermLastRefreshed(String listingId, int index){
     return Constants.SEARCH_TERM_LAST_REFRESHED_PREFIX +"#"+ listingId+"#"+index ;
   }

@@ -79,6 +79,7 @@ public class RefreshAllRanks extends AsyncTask {
             String preferenceId = PreferenceNameHelper.getSearchTermLastRefreshed(listingId, i);
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString(preferenceId, EtsyUtils.getPreferenceDateFormat().format(Calendar.getInstance().getTime())).commit();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getRankChangeIndicatorName(), true).commit();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getItemRankChangeDismissFlagName(listingId), false).commit();
 
           }
         }

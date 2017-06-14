@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,26 @@ public class RankChangeFragment extends Fragment {
         new LoadRankChangesAsyncTask(getContext(), root, loadingPanel).execute();
       }
     });
+
+    final RecyclerView recyclerView = (RecyclerView)root.findViewById(R.id.list);
+    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+      @Override
+      public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        return false;
+      }
+
+      @Override
+      public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+        String listingId = ((RankChangeRecyclerViewAdapter.ViewHolder)viewHolder).listingId;
+        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(PreferenceNameHelper.getItemRankChangeDismissFlagName(listingId), true).commit();
+        RankChangeRecyclerViewAdapter adapter = (RankChangeRecyclerViewAdapter) recyclerView.getAdapter();
+        adapter.removeItem(viewHolder.getAdapterPosition());
+        recyclerView.getAdapter().notifyItemRemoved(viewHolder.getAdapterPosition());
+      }
+    };
+
+    ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+    itemTouchHelper.attachToRecyclerView(recyclerView);
     return root;
   }
 

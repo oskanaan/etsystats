@@ -48,10 +48,12 @@ public class RankPreferenceTextChangeListener implements TextWatcher {
     int rankChange = EtsyUtils.compareRankToPrevious(context, listingId, index);
     if(rankChange == -1){
       PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getRankChangeIndicatorName(), true).commit();
+      PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getItemRankChangeDismissFlagName(listingId), false).commit();
       increase.setVisibility(View.GONE);
       decrease.setVisibility(View.VISIBLE);
     } else if(rankChange == 1){
       PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getRankChangeIndicatorName(), true).commit();
+      PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PreferenceNameHelper.getItemRankChangeDismissFlagName(listingId), false).commit();
       increase.setVisibility(View.VISIBLE);
       decrease.setVisibility(View.GONE);
     } else {

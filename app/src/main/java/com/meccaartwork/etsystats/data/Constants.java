@@ -18,6 +18,7 @@ public interface Constants {
   //Settings prefixes
   String SEARCH_TERM_PREFIX = "SearchTerm";
   String SEARCH_TERM_RANK_PREFIX = "SearchTermRank";
+  String RANK_CHANGE_DISMISS_FLAG = "DismissRankChange";
   String FAVOURITE_PREFIX = "Favourite";
   String REFRESH_PERIOD_PREFIX = "RefreshPeriod";
   String SEARCH_TERM_LAST_REFRESHED_PREFIX = "LastRefreshed";
