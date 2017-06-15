@@ -231,4 +231,31 @@ public class EtsyUtils {
       }
     }
   }
+
+  public static JSONArray getShopListingsWithRankChanges(Context context, int shopId) throws JSONException {
+    Log.d(TAG, "Getting shop listings with rank changes");
+    JSONArray jsonArray = EtsyApi.getInstance().getAllShopListings(context, shopId);
+    JSONArray filtered = new JSONArray();
+
+    Log.d(TAG, "Filtering results to get only ones with rank changes");
+
+    for(int i=jsonArray.length()-1 ; i>=0 ; i--){
+      String listingId = ((JSONObject)jsonArray.get(i)).getString("listing_id");
+      if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PreferenceNameHelper.getItemRankChangeDismissFlagName(listingId), false)){
+        //User has dimissed this item.
+        continue;
+      }
+      for(int j=1 ; j< Constants.MAX_SEARCH_TERMS+1; j++){
+        Log.d(TAG, "Processing listing with id "+listingId);
+        if(EtsyUtils.compareRankToPrevious(context, listingId, j) != 0){
+          Log.d(TAG, "Listing with id "+listingId+" has rank changes, adding it to filtered list.");
+          filtered.put(jsonArray.get(i));
+          break;
+        }
+      }
+    }
+
+    Log.d(TAG, "Filtered list is: "+filtered);
+    return filtered;
+  }
 }

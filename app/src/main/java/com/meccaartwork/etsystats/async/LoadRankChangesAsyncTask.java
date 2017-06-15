@@ -44,7 +44,7 @@ public class LoadRankChangesAsyncTask extends NetworkEnabledAsyncTask {
       int shopId = EtsyUtils.getShopId(context);
 
       if(shopId != -1){
-        return EtsyApi.getInstance().getShopListingsWithRankChanges(context, shopId);
+        return EtsyUtils.getShopListingsWithRankChanges(context, shopId);
       }
     } catch (JSONException e) {
       Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());

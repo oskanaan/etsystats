@@ -114,11 +114,11 @@ public class MockDataTest extends ApplicationTestCase<Application> {
     pressBack();
     pressBack();
     onView(withId(R.id.pager)).perform(swipeRight());
-    onView(withId(R.id.swiperefresh)).perform(swipeDown());
+    onView(withId(R.id.itemsSwiperefresh)).perform(swipeDown());
     onData(allOf(is(instanceOf(JSONObject.class)), new JsonObjectMatcher("listing_id", new Integer("249591837")))).inAdapterView(withId(R.id.quickAccess)).perform(click());
     onView(withId(R.id.favourite)).perform(click());
     pressBack();
-    onView(withId(R.id.swiperefresh)).perform(swipeDown());
+    onView(withId(R.id.itemsSwiperefresh)).perform(swipeDown());
     onData(allOf(is(instanceOf(JSONObject.class)), new JsonObjectMatcher("listing_id", new Integer("249591837")))).inAdapterView(withId(R.id.quickAccess));
     onView(withId(R.id.quickAccess)).check(matches(new TypeSafeMatcher<View>() {
       @Override

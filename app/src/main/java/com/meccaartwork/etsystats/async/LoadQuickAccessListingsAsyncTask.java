@@ -70,7 +70,7 @@ public class LoadQuickAccessListingsAsyncTask extends NetworkEnabledAsyncTask {
   protected void onPostExecute(Object o) {
     super.onPostExecute(o);
     loadingPanel.setVisibility(View.GONE);
-    SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+    SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.itemsSwiperefresh);
     refreshLayout.setRefreshing(false);
     JSONArray returnedData;
     if(o==null){

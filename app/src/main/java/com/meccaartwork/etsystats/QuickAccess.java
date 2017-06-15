@@ -29,7 +29,7 @@ public class QuickAccess extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     root = inflater.inflate(R.layout.content_my_items, container, false);
-    final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swiperefresh);
+    final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.itemsSwiperefresh);
     ListView categoryListings = ((ListView)root.findViewById(R.id.quickAccess));
     categoryListings.setEmptyView(root.findViewById(R.id.noResults));
     loadingPanel = root.findViewById(R.id.loadingPanel);
