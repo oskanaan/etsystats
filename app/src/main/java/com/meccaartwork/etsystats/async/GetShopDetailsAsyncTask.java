@@ -55,20 +55,35 @@ public class GetShopDetailsAsyncTask extends NetworkEnabledAsyncTask{
   @Override
   protected Object doInBackground(Object[] params) {
     JSONArray shops = EtsyApi.getInstance().getShopData(context, shopNameText);
-    if (shops.length() == 1){
-      try {
-        shopId = ((JSONObject) shops.get(0)).getInt("shop_id");
-        shopName = ((JSONObject) shops.get(0)).getString("shop_name");
-        shopTitle = ((JSONObject) shops.get(0)).getString("title");
-        imageUrl = ((JSONObject) shops.get(0)).getString("icon_url_fullxfull");
-
-        drawable = new ImageLoader(context, 350).getDrawable(imageUrl);
-      } catch (JSONException e) {
-        Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
+    JSONObject match = null;
+    int length = shops.length();
+    try {
+      if (shops.length() == 1){
+        match = (JSONObject) shops.get(0);
+        length = 1;
+      } else {
+        //Check if an exact match exist
+        for(int i=0;i<shops.length();i++){
+          if(((JSONObject)shops.get(i)).getString("shop_name").equalsIgnoreCase(shopNameText)){
+            match = (JSONObject)shops.get(i);
+            length = 1;
+            break;
+          }
+        }
       }
 
+      if(match != null){
+        shopId = match.getInt("shop_id");
+        shopName = match.getString("shop_name");
+        shopTitle = match.getString("title");
+        imageUrl = match.getString("icon_url_fullxfull");
+
+        drawable = new ImageLoader(context, 350).getDrawable(imageUrl);
+      }
+    } catch (JSONException e) {
+      Log.e(this.getClass().getName(), "JSON error - Couldnt not retrieve values from json: "+e.getMessage());
     }
-    return shops.length();
+    return length;
   }
 
   @Override
