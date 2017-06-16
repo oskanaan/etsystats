@@ -213,6 +213,24 @@ public class MockDataTest extends ApplicationTestCase<Application> {
       }
 
     }));
+
+    onData(allOf(is(instanceOf(JSONObject.class)), new JsonObjectMatcher("listing_id", new Integer("249591837")))).inAdapterView(withId(R.id.list)).perform(swipeRight());
+    onData(allOf(is(instanceOf(JSONObject.class)), new JsonObjectMatcher("listing_id", new Integer("349591837")))).inAdapterView(withId(R.id.list)).perform(swipeRight());
+
+    onView(withId(R.id.list)).check(matches(new TypeSafeMatcher<View>() {
+      @Override
+      public void describeTo(org.hamcrest.Description description) {
+
+      }
+
+      @Override
+      public boolean matchesSafely(View view) {
+        RecyclerView listView = (RecyclerView) view;
+
+        return listView.getChildCount()==0;
+      }
+
+    }));
   }
 
   public static ViewAction withCustomConstraints(final ViewAction action, final Matcher<View> constraints) {
